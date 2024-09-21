@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:roadcarsapp/view/screens/home_screen.dart';
-import './view/widgets/bottom_navigation.dart'; // Importa o widget CarCard
-import './view/screens/catalog_screen.dart';
-import './view/screens/login_screen.dart';
+import '../screens/login_screen.dart'; // Import the LoginScreen
+import '../screens/catalog_screen.dart'; // Import the RegisterScreen
+import '../screens/home_screen.dart'; // Import the HomePage
 
 void main() {
   runApp(const MyApp());
@@ -36,9 +35,9 @@ class _MainPageState extends State<MainPage> {
 
   // Lista de páginas correspondentes às opções do menu inferior
   final List<Widget> _pages = [
-    HomeScreen(),      // Mantemos a HomePage já existente
-    const CatalogPage(),    // Página de catálogo de carros
-    LoginScreen() // Página de login/logout
+    HomeScreen(),
+    CatalogPage(),
+    LoginScreen(),
   ];
 
   @override
@@ -48,12 +47,12 @@ class _MainPageState extends State<MainPage> {
         title: const Text('Roadcars'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: _pages[_currentIndex], // Exibe a página atual com base no índice
+      body: _pages[_currentIndex], // Exibe a página atual baseada no índice
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
-            _currentIndex = index; // Atualiza o índice e exibe a página correspondente
+            _currentIndex = index; // Atualiza o índice atual ao clicar em uma aba
           });
         },
         items: const [
@@ -67,10 +66,11 @@ class _MainPageState extends State<MainPage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.login),
-            label: 'Login/Logout',
+            label: 'Login',
           ),
         ],
       ),
     );
   }
 }
+
