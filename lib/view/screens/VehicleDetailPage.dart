@@ -32,7 +32,7 @@ class VehicleDetailPage extends StatelessWidget {
                       child: Image.network(
                         vehicle['image']!,
                         fit: BoxFit.cover,
-                        height: 250,
+                        height: 400,
                         width: double.infinity,
                       ),
                     ),

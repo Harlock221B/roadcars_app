@@ -10,7 +10,7 @@ final List<Map<String, String>> vehicles = [
     'color': 'Vermelho',
   },
   {
-    'image': 'https://upload.wikimedia.org/wikipedia/commons/d/de/Range_Rover_Velar_2.0_i4_R_Dynamic_SE_2020.jpg',
+    'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/2018_Land_Rover_Range_Rover_Velar_HSE_D24_2.0_Front.jpg/640px-2018_Land_Rover_Range_Rover_Velar_HSE_D24_2.0_Front.jpg',
     'name': 'Range Rover Velar',
     'description': 'Luxo e robustez em um único veículo.',
     'price': 'R\$ 750,000',
@@ -20,7 +20,7 @@ final List<Map<String, String>> vehicles = [
     'color': 'Prata',
   },
   {
-    'image': 'https://upload.wikimedia.org/wikipedia/commons/4/4b/BMW_5_Series_G30.jpg',
+    'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/BMW_M2_Edition_designed_by_FUTURA_2000_%281%29.jpg/640px-BMW_M2_Edition_designed_by_FUTURA_2000_%281%29.jpg',
     'name': 'BMW Série 5',
     'description': 'Elegância e conforto em cada detalhe.',
     'price': 'R\$ 550,000',
@@ -30,7 +30,7 @@ final List<Map<String, String>> vehicles = [
     'color': 'Preto',
   },
   {
-    'image': 'https://upload.wikimedia.org/wikipedia/commons/0/06/Audi_A6_S6_Sportback_2020.jpg',
+    'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/AUDI_A6_ALLROAD_QUATTRO_C8_China_%282%29.jpg/640px-AUDI_A6_ALLROAD_QUATTRO_C8_China_%282%29.jpg',
     'name': 'Audi A6',
     'description': 'Tecnologia avançada e desempenho excepcional.',
     'price': 'R\$ 400,000',
@@ -40,7 +40,7 @@ final List<Map<String, String>> vehicles = [
     'color': 'Branco',
   },
   {
-    'image': 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Tesla_Model_S_2020.jpg',
+    'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/20180630_Tesla_Model_S_70D_2015_midnight_blue_left_front.jpg/640px-20180630_Tesla_Model_S_70D_2015_midnight_blue_left_front.jpg',
     'name': 'Tesla Model S',
     'description': 'Performance elétrica com um toque de luxo.',
     'price': 'R\$ 600,000',
@@ -50,7 +50,7 @@ final List<Map<String, String>> vehicles = [
     'color': 'Cinza',
   },
   {
-    'image': 'https://upload.wikimedia.org/wikipedia/commons/1/14/Mercedes-Benz_E-Class_W213.jpg',
+    'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Mercedes-Benz_W213_Facelift_IMG_5257.jpg/640px-Mercedes-Benz_W213_Facelift_IMG_5257.jpg',
     'name': 'Mercedes-Benz Classe E',
     'description': 'Combinação de performance e conforto.',
     'price': '550,000',
@@ -60,7 +60,7 @@ final List<Map<String, String>> vehicles = [
     'color': 'Azul',
   },
   {
-    'image': 'https://upload.wikimedia.org/wikipedia/commons/e/e4/Porsche_Panamera_2020.jpg',
+    'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Porsche_971_Panamera_Turbo_1X7A6497.jpg/640px-Porsche_971_Panamera_Turbo_1X7A6497.jpg',
     'name': 'Porsche Panamera',
     'description': 'Esportividade e conforto em um único veículo.',
     'price': 'R\$ 850,000',

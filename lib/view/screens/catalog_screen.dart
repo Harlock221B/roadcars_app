@@ -12,6 +12,7 @@ class CatalogPage extends StatefulWidget {
 
 class _CatalogPageState extends State<CatalogPage> {
   String selectedFilter = 'Preço';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,32 +20,32 @@ class _CatalogPageState extends State<CatalogPage> {
         centerTitle: true,
         title: const Text(
           'Catálogo de Veículos',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.blueGrey, Color(0xFF292e49)],
-                begin: Alignment.bottomLeft,
-                end: Alignment.topRight,
+              colors: [Color(0xFF536976), Color(0xFF292e49)],
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight,
             ),
           ),
         ),
         actions: [
           // Menu de filtros
           PopupMenuButton<String>(
-            icon: Icon(Icons.filter_list, color: Colors.white),
+            icon: const Icon(Icons.filter_list, color: Color.fromARGB(255, 215, 215, 214)),
             onSelected: (String value) {
               setState(() {
-          selectedFilter = value;
+                selectedFilter = value;
               });
             },
             itemBuilder: (BuildContext context) {
               return {'Preço', 'Nome'}.map((String choice) {
-          return PopupMenuItem<String>(
-            value: choice,
-            child: Text(choice),
-          );
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice, style: const TextStyle(color: Colors.black)),
+                );
               }).toList();
             },
           ),
@@ -57,7 +58,18 @@ class _CatalogPageState extends State<CatalogPage> {
             itemCount: vehicles.length,
             itemBuilder: (context, index) {
               final vehicle = vehicles[index];
-              return VehicleCard(vehicle: vehicle);
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    // Ação ao tocar no card do veículo
+                  },
+                  child: Material(
+                    elevation: 8,
+                    child: VehicleCard(vehicle: vehicle),
+                  ),
+                ),
+              );
             },
           ),
         ),
