@@ -12,7 +12,6 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Road Cars Consulting'),
-        backgroundColor: Colors.blueAccent,
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -22,7 +21,6 @@ class HomeScreen extends StatelessWidget {
             // Seção de boas-vindas
             Container(
               padding: const EdgeInsets.all(16.0),
-              color: Colors.blueAccent,
               child: Column(
                 children: const [
                   Text(
@@ -30,7 +28,6 @@ class HomeScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -39,7 +36,6 @@ class HomeScreen extends StatelessWidget {
                     'Oferecemos uma vasta gama de veículos para atender a todas as suas necessidades e preferências, com confiança e excelência.',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.white70,
                     ),
                     textAlign: TextAlign.center,
                   ),
