@@ -56,7 +56,13 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Roadcars'),
+        title: const Text(
+          'Roadcars',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: Colors.black,
       ),
       body: _pages[_currentIndex], // Exibe a página com base no índice selecionado

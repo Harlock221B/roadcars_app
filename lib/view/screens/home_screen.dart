@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
   final List<String> imgList = [
-    '../../assets/coupe.jpg',
-    '../../assets/sedan.jpeg',
-    '../../assets/suv.jpg',
+    'assets/images/carros/carro_compacto.jpg',
+    'assets/images/carros/carro_esportivo.jpg',
+    'assets/images/carros/carro_familiar.jpg',
   ];
 
   @override
