@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
   final List<String> imgList = [
-    'https://www.automaxfiat.com.br/wp-content/uploads/2021/09/carros-compactos-fiat-argo.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Nissan_Skyline_R34_GT-R_N%C3%BCr_001.jpg/640px-Nissan_Skyline_R34_GT-R_N%C3%BCr_001.jpgr',
     'https://forbes.com.br/wp-content/uploads/2021/04/ForbesLife_Mustang_140421_Divulgac%CC%A7ao.jpg',
     'https://media-repository-mobiauto.storage.googleapis.com/production/images/editorial/magazine/1707509541867.hyundai-creta-platinum-2022-3x4-dianteira.jpg',
   ];
@@ -42,29 +42,6 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Carrossel de imagens
-            Container(
-              height: 250.0,
-              margin: const EdgeInsets.symmetric(vertical: 16.0),
-              child: PageView.builder(
-                itemCount: imgList.length,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 12.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0),
-                      child: Image.network(
-                        imgList[index],
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-
             // Cards com informações
             Padding(
               padding: const EdgeInsets.all(16.0),
