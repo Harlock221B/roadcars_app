@@ -4,7 +4,7 @@ import '../screens/VehicleDetailPage.dart';
 class VehicleCard extends StatelessWidget {
   final Map<String, String> vehicle;
 
-  const VehicleCard({required this.vehicle});
+  const VehicleCard({super.key, required this.vehicle});
 
   @override
   Widget build(BuildContext context) {

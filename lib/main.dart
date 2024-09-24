@@ -14,17 +14,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Roadcars',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: const ColorScheme(
           primary: Colors.black,
           secondary: Colors.white,
           surface: Colors.white,
-          background: Colors.black,
           error: Colors.red,
           onPrimary: Colors.white,
           onSecondary: Colors.black,
           onSurface: Colors.black,
-          onBackground: Colors.white,
           onError: Colors.white,
           brightness: Brightness.dark,
         ),
@@ -48,7 +47,7 @@ class _MainPageState extends State<MainPage> {
   // Lista de páginas
   final List<Widget> _pages = [
     HomeScreen(),
-    CatalogPage(),
+    const CatalogPage(),
     LoginScreen(),
   ];
 

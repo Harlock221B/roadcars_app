@@ -8,7 +8,7 @@ class VehicleDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String sellerPhone = "19982032604";
+    const String sellerPhone = "19982032604";
     final String whatsappUrl = "https://wa.me/$sellerPhone?text=Olá!%20Estou%20interessado%20no%20${vehicle['name']}.";
 
     return Scaffold(

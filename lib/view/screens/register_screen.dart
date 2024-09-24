@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class RegistrationScreen extends StatefulWidget {
+  const RegistrationScreen({super.key});
+
   @override
   _RegistrationScreenState createState() => _RegistrationScreenState();
 }
@@ -9,7 +11,7 @@ class RegistrationScreen extends StatefulWidget {
 class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _acceptTerms = false;
   bool _receiveNewsletter = false;
-  double _userAge = 18;
+  final double _userAge = 18;
   String _selectedGender = 'Male';
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _dateController = TextEditingController(); // Controller para o campo de data

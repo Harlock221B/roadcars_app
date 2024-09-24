@@ -7,6 +7,8 @@ class HomeScreen extends StatelessWidget {
     'https://media-repository-mobiauto.storage.googleapis.com/production/images/editorial/magazine/1707509541867.hyundai-creta-platinum-2022-3x4-dianteira.jpg',
   ];
 
+  HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,8 +23,8 @@ class HomeScreen extends StatelessWidget {
             // Seção de boas-vindas
             Container(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: const [
+              child: const Column(
+                children: [
                   Text(
                     'Bem-vindo à Road Cars Consulting!',
                     style: TextStyle(
@@ -97,7 +99,7 @@ class HomeScreen extends StatelessWidget {
 
   // Função para criar cards de destaque
   Widget _buildFeatureCard(IconData icon, String title, String description) {
-    return Container(
+    return SizedBox(
       width: 160.0,
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),

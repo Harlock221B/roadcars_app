@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import './register_screen.dart'; // Import the RegisterScreen
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
