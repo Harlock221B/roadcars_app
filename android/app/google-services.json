@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "1056284825768",
+    "project_id": "roadcarsapp",
+    "storage_bucket": "roadcarsapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1056284825768:android:057e7d3abbd284a9db4a9d",
+        "android_client_info": {
+          "package_name": "com.roadcarsapp.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1056284825768-te4eg90a55lurqdoau11apbto8adbh4l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIYXgOPkuPw77vjCVmNtqAELqUNVd2D7E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1056284825768-te4eg90a55lurqdoau11apbto8adbh4l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1056284825768-emt2e1cg9dn1kpuukhne5vgdm7c3ee0m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.roadcarsapp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1056284825768:android:3b3297f8df94fad8db4a9d",
+        "android_client_info": {
+          "package_name": "com.roadcarsapp.br"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1056284825768-te4eg90a55lurqdoau11apbto8adbh4l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIYXgOPkuPw77vjCVmNtqAELqUNVd2D7E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1056284825768-te4eg90a55lurqdoau11apbto8adbh4l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1056284825768-emt2e1cg9dn1kpuukhne5vgdm7c3ee0m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.roadcarsapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
