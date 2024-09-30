@@ -6,6 +6,7 @@ import './view/screens/login_screen.dart';
 import './view/screens/catalog_screen.dart';
 import './view/screens/home_screen.dart';
 import './view/screens/profile_screen.dart'; // Importando a tela de perfil
+import './view/screens/add_car_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -93,6 +94,7 @@ class _MainPageState extends State<MainPage> {
           HomeScreen(),
           const CatalogPage(),
           isLoggedIn ? ProfileScreen() : const LoginScreen(),
+          AddCarScreen(),
         ];
 
         return Scaffold(
@@ -129,6 +131,10 @@ class _MainPageState extends State<MainPage> {
               BottomNavigationBarItem(
                 icon: Icon(isLoggedIn ? Icons.person : Icons.login),
                 label: isLoggedIn ? 'Profile' : 'Login',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.add_circle), // Ícone para adicionar carro
+                label: 'Adicionar Carro',
               ),
             ],
           ),

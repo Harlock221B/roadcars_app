@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import './email_verification_screen.dart'; // Importe a tela de verificação de email
+import 'package:cloud_firestore/cloud_firestore.dart';
+import './email_verification_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -13,27 +14,40 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> _handleRegister() async {
     if (_formKey.currentState!.validate()) {
       try {
-        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        // Criar o usuário no Firebase Auth
+        UserCredential userCredential =
+            await _auth.createUserWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         );
 
-        // Enviar email de verificação
         await userCredential.user?.sendEmailVerification();
 
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user?.uid)
+            .set({
+          'displayName': _nameController.text,
+          'email': _emailController.text,
+          'createdAt': Timestamp.now(),
+          'profileImageUrl': '',
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registro bem-sucedido! Verifique seu e-mail.')),
+          const SnackBar(
+              content: Text('Registro bem-sucedido! Verifique seu e-mail.')),
         );
 
-        // Redirecionar para a tela de verificação de email
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const EmailVerificationScreen()),
+          MaterialPageRoute(
+              builder: (context) => const EmailVerificationScreen()),
         );
       } on FirebaseAuthException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -47,6 +61,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
@@ -66,6 +81,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   const Text(
                     'Register',
                     style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Nome',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira seu nome';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
