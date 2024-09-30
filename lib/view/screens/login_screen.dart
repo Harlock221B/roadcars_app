@@ -14,7 +14,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> _handleLogin() async {
@@ -27,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (userCredential.user?.emailVerified ?? false) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login Successful!')),
+            const SnackBar(content: Text('Login bem-sucedido!')),
           );
           Navigator.pushReplacement(
             context,
@@ -36,13 +35,12 @@ class _LoginScreenState extends State<LoginScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content:
-                    Text('Por favor, verifique seu e-mail para fazer login.')),
+                content: Text('Por favor, verifique seu e-mail para login.')),
           );
         }
       } on FirebaseAuthException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login Failed: ${e.message}')),
+          SnackBar(content: Text('Falha no login: ${e.message}')),
         );
       }
     }
@@ -58,9 +56,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: SingleChildScrollView(
             child: Form(
               key: _formKey,
@@ -68,17 +67,27 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Text(
-                    'Login',
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-                  // Campo de email
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
+                    'Bem-vindo de volta!',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueAccent,
                     ),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Faça login na sua conta',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  _buildTextField(
+                    controller: _emailController,
+                    label: 'Email',
+                    icon: Icons.email,
+                    keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor, insira seu email';
@@ -91,14 +100,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 20),
-                  // Campo de senha
-                  TextFormField(
+                  _buildTextField(
                     controller: _passwordController,
+                    label: 'Senha',
+                    icon: Icons.lock,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Senha',
-                      border: OutlineInputBorder(),
-                    ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor, insira sua senha';
@@ -109,13 +115,37 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const SizedBox(height: 20),
-                  // Botão de login
-                  ElevatedButton(
-                    onPressed: _handleLogin,
-                    child: const Text('Login'),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        // Lógica de recuperação de senha
+                      },
+                      child: const Text(
+                        'Esqueceu a senha?',
+                        style: TextStyle(color: Colors.blueAccent),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 20),
-                  // Texto para redirecionar para a página de registro
+                  ElevatedButton(
+                    onPressed: _handleLogin,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 15,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
@@ -130,7 +160,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                     const RegistrationScreen()),
                           );
                         },
-                        child: const Text('Crie uma aqui!'),
+                        child: const Text(
+                          'Crie uma aqui!',
+                          style: TextStyle(color: Colors.blueAccent),
+                        ),
                       ),
                     ],
                   ),
@@ -140,6 +173,33 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+    required String? Function(String?) validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: Colors.blueAccent),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.blueAccent),
+        ),
+      ),
+      validator: validator,
     );
   }
 }

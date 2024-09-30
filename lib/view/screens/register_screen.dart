@@ -15,6 +15,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   Future<void> _handleRegister() async {
@@ -35,6 +36,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             .set({
           'displayName': _nameController.text,
           'email': _emailController.text,
+          'phone': _phoneController.text,
           'createdAt': Timestamp.now(),
           'profileImageUrl': '',
         });
@@ -62,13 +64,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _nameController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("User Registration")),
+      appBar: AppBar(title: const Text("Cadastro de Usuário")),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -79,16 +82,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const Text(
-                    'Register',
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                    'Criar Conta',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueAccent,
+                    ),
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  _buildTextField(
                     controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nome',
-                      border: OutlineInputBorder(),
-                    ),
+                    label: 'Nome Completo',
+                    icon: Icons.person,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor, insira seu nome';
@@ -97,12 +102,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     },
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  _buildTextField(
                     controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
-                    ),
+                    label: 'Email',
+                    icon: Icons.email,
+                    keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor, insira seu email';
@@ -111,13 +115,24 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     },
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
+                  _buildTextField(
+                    controller: _phoneController,
+                    label: 'Telefone',
+                    icon: Icons.phone,
+                    keyboardType: TextInputType.phone,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira seu telefone';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  _buildTextField(
                     controller: _passwordController,
+                    label: 'Senha',
+                    icon: Icons.lock,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Senha',
-                      border: OutlineInputBorder(),
-                    ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor, insira sua senha';
@@ -127,17 +142,52 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 50,
+                        vertical: 15,
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     onPressed: _handleRegister,
-                    child: const Text('Register'),
+                    child: const Text('Registrar'),
                   ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+    required String? Function(String?) validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      validator: validator,
     );
   }
 }

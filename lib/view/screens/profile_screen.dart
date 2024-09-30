@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart'; // Importação do Firebase Storage
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -36,8 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _nameController.text = userDoc['displayName'] ?? '';
           _phoneController.text = userDoc['phone'] ?? '';
           _favoriteCars = List<String>.from(userDoc['favoriteCars'] ?? []);
-          _profileImageUrl =
-              userDoc['profileImageUrl']; // Carrega a URL da imagem do perfil
+          _profileImageUrl = userDoc['profileImageUrl'];
         });
       }
     }
@@ -47,41 +46,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     User? user = _auth.currentUser;
     if (user != null) {
       if (_profileImage != null) {
-        // Faz o upload da imagem e obtém o URL
         _profileImageUrl =
             await _uploadImageToStorage(_profileImage!, user.uid);
       }
 
-      // Atualiza os dados do perfil no Firestore
       await _firestore.collection('users').doc(user.uid).update({
         'displayName': _nameController.text,
         'phone': _phoneController.text,
         'favoriteCars': _favoriteCars,
-        'profileImageUrl':
-            _profileImageUrl, // Atualiza a URL da imagem do perfil
+        'profileImageUrl': _profileImageUrl,
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Perfil atualizado com sucesso!')),
+        const SnackBar(content: Text('Perfil atualizado com sucesso!')),
       );
     }
   }
 
-  // Função para fazer upload da imagem no Firebase Storage
   Future<String> _uploadImageToStorage(File image, String userId) async {
     try {
-      // Definir o caminho no storage
       Reference storageRef = _storage.ref().child('profileImages/$userId.jpg');
-
-      // Upload da imagem
       UploadTask uploadTask = storageRef.putFile(image);
-
-      // Esperar a conclusão do upload
       TaskSnapshot snapshot = await uploadTask;
-
-      // Obter o download URL da imagem
-      String downloadUrl = await snapshot.ref.getDownloadURL();
-      return downloadUrl;
+      return await snapshot.ref.getDownloadURL();
     } catch (e) {
       print('Erro ao fazer upload da imagem: $e');
       return '';
@@ -104,12 +91,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (context) {
         String newCar = '';
         return AlertDialog(
-          title: Text('Adicionar Carro Favorito'),
+          title: const Text('Adicionar Carro Favorito'),
           content: TextField(
             onChanged: (value) {
               newCar = value;
             },
-            decoration: InputDecoration(hintText: 'Digite o nome do carro'),
+            decoration: const InputDecoration(hintText: 'Digite o nome do carro'),
           ),
           actions: [
             TextButton(
@@ -121,7 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 }
                 Navigator.pop(context);
               },
-              child: Text('Adicionar'),
+              child: const Text('Adicionar'),
             ),
           ],
         );
@@ -135,74 +122,119 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  Future<void> _logout() async {
+    await _auth.signOut();
+    Navigator.of(context).pushReplacementNamed('/login');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Perfil'),
+        title: const Text('Perfil'),
         actions: [
           IconButton(
-            icon: Icon(Icons.save),
+            icon: const Icon(Icons.save),
             onPressed: _updateProfile,
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _logout, // Botão de logout
           ),
         ],
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: ListView(
+        child: Column(
           children: [
-            Center(
-              child: GestureDetector(
-                onTap: _pickImage,
-                child: CircleAvatar(
-                  radius: 50,
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                CircleAvatar(
+                  radius: 70,
                   backgroundImage: _profileImageUrl != null
                       ? NetworkImage(_profileImageUrl!)
                       : null,
                   child: _profileImage == null && _profileImageUrl == null
-                      ? Icon(Icons.camera_alt, size: 50)
+                      ? const Icon(Icons.camera_alt, size: 50)
                       : null,
                 ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _nameController,
-              decoration: InputDecoration(
-                labelText: 'Nome',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _phoneController,
-              keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
-                labelText: 'Telefone',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              'Carros Favoritos',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            ..._favoriteCars.map((car) => ListTile(
-                  title: Text(car),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () => _removeFavoriteCar(car),
+                Positioned(
+                  bottom: 0,
+                  right: 10,
+                  child: InkWell(
+                    onTap: _pickImage,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black,
+                      ),
+                      child: const Icon(Icons.edit, color: Colors.white),
+                    ),
                   ),
-                )),
-            const SizedBox(height: 10),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _buildTextField(_nameController, 'Nome', Icons.person),
+            const SizedBox(height: 20),
+            _buildTextField(_phoneController, 'Telefone', Icons.phone,
+                keyboardType: TextInputType.phone),
+            const SizedBox(height: 20),
+            _buildFavoriteCarsSection(),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _addFavoriteCar,
-              child: Text('Adicionar Carro Favorito'),
+              onPressed: _updateProfile,
+              child: const Text('Salvar Alterações'),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label,
+      IconData icon, {TextInputType keyboardType = TextInputType.text}) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        border: const OutlineInputBorder(),
+      ),
+    );
+  }
+
+  Widget _buildFavoriteCarsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Carros Favoritos',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            IconButton(
+              icon: const Icon(Icons.add_circle_outline),
+              onPressed: _addFavoriteCar,
+            ),
+          ],
+        ),
+        if (_favoriteCars.isEmpty)
+          const Center(child: Text('Nenhum carro favorito adicionado')),
+        for (String car in _favoriteCars)
+          ListTile(
+            title: Text(car),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () => _removeFavoriteCar(car),
+            ),
+          ),
+      ],
     );
   }
 }
