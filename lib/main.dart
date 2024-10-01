@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Importando FirebaseAuth
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 import './view/screens/login_screen.dart';
 import './view/screens/catalog_screen.dart';
 import './view/screens/home_screen.dart';
-import './view/screens/profile_screen.dart'; // Importando a tela de perfil
+import './view/screens/profile_screen.dart';
+import './view/screens/add_car_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,7 +54,6 @@ class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
   bool _isLoading = true;
 
-  // Função para inicializar o Firebase
   Future<void> _initializeFirebase() async {
     try {
       await Firebase.initializeApp(
@@ -86,7 +86,6 @@ class _MainPageState extends State<MainPage> {
       builder: (context, snapshot) {
         bool isLoggedIn = snapshot.data != null;
 
-        // Lista de páginas
         final List<Widget> _pages = [
           HomeScreen(),
           const CatalogPage(),
@@ -100,38 +99,85 @@ class _MainPageState extends State<MainPage> {
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
+                fontSize: 22,
               ),
             ),
             backgroundColor: Colors.black,
+            elevation: 2,
           ),
-          body: _pages[_currentIndex],
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            backgroundColor: Colors.black,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.grey,
-            onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
+          body: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: _pages[_currentIndex],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddCarScreen()),
+              );
             },
-            items: [
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
+            backgroundColor: Colors.blue.shade800,
+            child: const Icon(
+              Icons.add,
+              size: 26,
+              color: Colors.white,
+            ),
+            elevation: 5,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          bottomNavigationBar: BottomAppBar(
+            shape: const CircularNotchedRectangle(),
+            notchMargin: 4.0, // Diminuído para evitar overflow
+            color: Colors.black,
+            child: SizedBox(
+              height: 56, // Diminuir a altura do BottomNavigationBar
+              child: BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
+                currentIndex: _currentIndex,
+                backgroundColor: Colors.black,
+                selectedItemColor: Colors.blueAccent,
+                unselectedItemColor: Colors.grey.shade400,
+                showSelectedLabels: true,
+                showUnselectedLabels: false,
+                selectedLabelStyle: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+                onTap: (index) {
+                  setState(() {
+                    _currentIndex = index;
+                  });
+                },
+                items: [
+                  BottomNavigationBarItem(
+                    icon: _customIcon(Icons.home, 0),
+                    label: 'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _customIcon(Icons.car_rental, 1),
+                    label: 'Catálogo',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: _customIcon(isLoggedIn ? Icons.person : Icons.login, 2),
+                    label: isLoggedIn ? 'Perfil' : 'Login',
+                  ),
+                ],
               ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.car_rental),
-                label: 'Catálogo',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(isLoggedIn ? Icons.person : Icons.login),
-                label: isLoggedIn ? 'Profile' : 'Login',
-              ),
-            ],
+            ),
           ),
         );
       },
+    );
+  }
+
+  Widget _customIcon(IconData icon, int index) {
+    return Icon(
+      icon,
+      size: _currentIndex == index ? 27 : 24, // Reduzindo o tamanho do ícone
+      color: _currentIndex == index ? Colors.blueAccent : Colors.grey.shade400,
     );
   }
 }

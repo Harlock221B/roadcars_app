@@ -21,7 +21,6 @@ class _AddCarScreenState extends State<AddCarScreen> {
   File? _carImage;
   String? _carImageUrl;
 
-  // Função para pegar a imagem do carro
   Future<void> _pickImage() async {
     final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
@@ -31,7 +30,6 @@ class _AddCarScreenState extends State<AddCarScreen> {
     }
   }
 
-  // Função para fazer upload da imagem do carro no Firebase Storage
   Future<String?> _uploadCarImageToStorage(String carId) async {
     if (_carImage == null) return null;
 
@@ -47,11 +45,9 @@ class _AddCarScreenState extends State<AddCarScreen> {
     }
   }
 
-  // Função para adicionar carro no Firestore
   Future<void> _addCar() async {
     if (_formKey.currentState!.validate()) {
       try {
-        // Cria um novo documento no Firestore com um ID único
         DocumentReference carDoc = await _firestore.collection('cars').add({
           'brand': _brandController.text,
           'model': _modelController.text,
@@ -61,10 +57,8 @@ class _AddCarScreenState extends State<AddCarScreen> {
           'createdAt': FieldValue.serverTimestamp(),
         });
 
-        // Faz o upload da imagem e obtém a URL
         _carImageUrl = await _uploadCarImageToStorage(carDoc.id);
 
-        // Atualiza o documento com a URL da imagem
         if (_carImageUrl != null) {
           await carDoc.update({
             'imageUrl': _carImageUrl,
@@ -74,7 +68,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Carro adicionado com sucesso!')),
         );
-        Navigator.pop(context); // Volta para a tela anterior
+        Navigator.pop(context);
 
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -89,92 +83,124 @@ class _AddCarScreenState extends State<AddCarScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Adicionar Carro para Venda'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: _addCar, // Função de salvar
-          ),
-        ],
+        centerTitle: true,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addCar,
+        child: Icon(Icons.save),
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _brandController,
-                decoration: InputDecoration(labelText: 'Marca'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira a marca do carro';
-                  }
-                  return null;
-                },
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          elevation: 5,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                children: [
+                  SizedBox(height: 20),
+                  TextFormField(
+                    controller: _brandController,
+                    decoration: InputDecoration(
+                      labelText: 'Marca',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira a marca do carro';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _modelController,
+                    decoration: InputDecoration(
+                      labelText: 'Modelo',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira o modelo do carro';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _yearController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Ano',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira o ano do carro';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _priceController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Preço',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira o preço do carro';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    controller: _descriptionController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      labelText: 'Descrição',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira uma descrição para o carro';
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage:
+                          _carImage != null ? FileImage(_carImage!) : null,
+                      child: _carImage == null ? Icon(Icons.camera_alt, size: 50) : null,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: _addCar,
+                    icon: Icon(Icons.add),
+                    label: Text('Adicionar Carro'),
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _modelController,
-                decoration: InputDecoration(labelText: 'Modelo'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira o modelo do carro';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _yearController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Ano'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira o ano do carro';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _priceController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Preço'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira o preço do carro';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _descriptionController,
-                maxLines: 3,
-                decoration: InputDecoration(labelText: 'Descrição'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira uma descrição para o carro';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 16),
-              GestureDetector(
-                onTap: _pickImage,
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage:
-                      _carImage != null ? FileImage(_carImage!) : null,
-                  child: _carImage == null ? Icon(Icons.camera_alt, size: 50) : null,
-                ),
-              ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _addCar,
-                child: Text('Adicionar Carro'),
-              ),
-            ],
+            ),
           ),
         ),
       ),
