@@ -59,7 +59,6 @@ class _MainPageState extends State<MainPage> {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-    } catch (e) {
     } finally {
       setState(() {
         _isLoading = false;
@@ -86,28 +85,16 @@ class _MainPageState extends State<MainPage> {
       builder: (context, snapshot) {
         bool isLoggedIn = snapshot.data != null;
 
-        final List<Widget> _pages = [
+        final List<Widget> pages = [
           HomeScreen(),
           const CatalogPage(),
           isLoggedIn ? ProfileScreen() : const LoginScreen(),
         ];
 
         return Scaffold(
-          appBar: AppBar(
-            title: const Text(
-              'Roadcars',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-              ),
-            ),
-            backgroundColor: Colors.black,
-            elevation: 2,
-          ),
           body: AnimatedSwitcher(
             duration: const Duration(milliseconds: 300),
-            child: _pages[_currentIndex],
+            child: pages[_currentIndex],
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {
@@ -117,14 +104,14 @@ class _MainPageState extends State<MainPage> {
               );
             },
             backgroundColor: Colors.blue.shade800,
+            elevation: 5,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: const Icon(
               Icons.add,
               size: 26,
               color: Colors.white,
-            ),
-            elevation: 5,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
             ),
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../widgets/VehicleCard.dart';
-import 'package:roadcarsapp/data/vehicles.dart';
 
-// Página Catálogo com lista de veículos
 class CatalogPage extends StatefulWidget {
   const CatalogPage({super.key});
 
@@ -12,6 +11,11 @@ class CatalogPage extends StatefulWidget {
 
 class _CatalogPageState extends State<CatalogPage> {
   String selectedFilter = 'Preço';
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Stream<QuerySnapshot> _getVehicles() {
+    return _firestore.collection('cars').snapshots();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +36,6 @@ class _CatalogPageState extends State<CatalogPage> {
           ),
         ),
         actions: [
-          // Menu de filtros
           PopupMenuButton<String>(
             icon: const Icon(Icons.filter_list, color: Color.fromARGB(255, 215, 215, 214)),
             onSelected: (String value) {
@@ -51,28 +54,50 @@ class _CatalogPageState extends State<CatalogPage> {
           ),
         ],
       ),
-      body: Container(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ListView.builder(
-            itemCount: vehicles.length,
-            itemBuilder: (context, index) {
-              final vehicle = vehicles[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: GestureDetector(
-                  onTap: () {
-                    // Ação ao tocar no card do veículo
-                  },
-                  child: Material(
-                    elevation: 8,
-                    child: VehicleCard(vehicle: vehicle),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _getVehicles(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('Nenhum veículo encontrado'));
+          }
+
+          var vehicles = snapshot.data!.docs;
+
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView.builder(
+              itemCount: vehicles.length,
+              itemBuilder: (context, index) {
+                var vehicle = vehicles[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      // Ação ao tocar no card do veículo
+                    },
+                    child: Material(
+                      elevation: 8,
+                      child: VehicleCard(
+                        vehicle: {
+                          'brand': vehicle['brand'],
+                          'model': vehicle['model'],
+                          'year': vehicle['year'],
+                          'price': vehicle['price'],
+                          'description': vehicle['description'],
+                          'imageUrls': vehicle['imageUrls'] as List<dynamic>,
+                        },
+                      ),
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
-        ),
+                );
+              },
+            ),
+          );
+        },
       ),
     );
   }

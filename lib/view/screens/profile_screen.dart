@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
@@ -81,6 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (pickedImage != null) {
       setState(() {
         _profileImage = File(pickedImage.path);
+        // A imagem será exibida imediatamente no avatar quando selecionada
       });
     }
   }
@@ -96,7 +99,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             onChanged: (value) {
               newCar = value;
             },
-            decoration: const InputDecoration(hintText: 'Digite o nome do carro'),
+            decoration:
+                const InputDecoration(hintText: 'Digite o nome do carro'),
           ),
           actions: [
             TextButton(
@@ -152,9 +156,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 CircleAvatar(
                   radius: 70,
-                  backgroundImage: _profileImageUrl != null
-                      ? NetworkImage(_profileImageUrl!)
-                      : null,
+                  backgroundImage: _profileImage != null
+                      ? FileImage(_profileImage!) // Exibe a imagem local
+                      : (_profileImageUrl != null
+                          ? NetworkImage(_profileImageUrl!) // Exibe a imagem do Firebase
+                          : null),
                   child: _profileImage == null && _profileImageUrl == null
                       ? const Icon(Icons.camera_alt, size: 50)
                       : null,
@@ -194,8 +200,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label,
-      IconData icon, {TextInputType keyboardType = TextInputType.text}) {
+  Widget _buildTextField(
+      TextEditingController controller, String label, IconData icon,
+      {TextInputType keyboardType = TextInputType.text}) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
