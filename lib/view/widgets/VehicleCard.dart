@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:roadcarsapp/view/screens/VehicleDetailPage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../screens/VehicleDetailPage.dart';
 
 class VehicleCard extends StatelessWidget {
   final Map<String, dynamic> vehicle;
@@ -10,7 +10,9 @@ class VehicleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Verifica se há URLs de imagem disponíveis e trata o caso onde o campo pode estar vazio ou nulo
-    String imageUrl = (vehicle['imageUrls'] != null && vehicle['imageUrls'].isNotEmpty && vehicle['imageUrls'][0] != null)
+    String imageUrl = (vehicle['imageUrls'] != null &&
+            vehicle['imageUrls'].isNotEmpty &&
+            vehicle['imageUrls'][0] != null)
         ? vehicle['imageUrls'][0] // Primeira imagem da lista
         : 'assets/images/fallback_image.jpg'; // Imagem de fallback
 
@@ -21,7 +23,7 @@ class VehicleCard extends StatelessWidget {
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                VehicleDetailPage(
+                VehicleDetailsPage(
                     vehicle: vehicle
                         .map((key, value) => MapEntry(key, value.toString()))),
             transitionsBuilder:
@@ -57,7 +59,8 @@ class VehicleCard extends StatelessWidget {
                 CachedNetworkImage(
                   imageUrl: imageUrl,
                   placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(), // Exibe um indicador de carregamento enquanto a imagem é carregada
+                    child:
+                        CircularProgressIndicator(), // Exibe um indicador de carregamento enquanto a imagem é carregada
                   ),
                   errorWidget: (context, url, error) => Image.asset(
                     'assets/images/fallback_image.jpg', // Exibe a imagem de fallback caso ocorra algum erro
@@ -125,7 +128,8 @@ class VehicleCard extends StatelessWidget {
                     vehicle['description'] ?? "Sem descrição",
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.grey[700], // Um cinza mais claro para contraste
+                      color: Colors
+                          .grey[700], // Um cinza mais claro para contraste
                     ),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
@@ -147,7 +151,7 @@ class VehicleCard extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => VehicleDetailPage(
+                              builder: (context) => VehicleDetailsPage(
                                   vehicle: vehicle.map((key, value) =>
                                       MapEntry(key, value.toString()))),
                             ),

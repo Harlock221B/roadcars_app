@@ -1,23 +1,24 @@
-
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class VehicleDetailPage extends StatelessWidget {
-  final Map<String, String> vehicle;
+class VehicleDetailsPage extends StatelessWidget {
+  final Map<String, dynamic> vehicle;
 
-  const VehicleDetailPage({super.key, required this.vehicle});
+  const VehicleDetailsPage({super.key, required this.vehicle});
 
   @override
   Widget build(BuildContext context) {
-    const String sellerPhone = "19982032604";
+    final String sellerPhone = "19982032604";
+    final String vehicleName = vehicle['model'] ?? 'Veículo Indefinido';
     final String whatsappUrl =
-        "https://wa.me/$sellerPhone?text=Olá!%20Estou%20interessado%20no%20${vehicle['name']}.";
+        "https://wa.me/$sellerPhone?text=Olá!%20Estou%20interessado%20no%20$vehicleName.";
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: Text(
-          vehicle['name']!,
+          vehicleName,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
           ),
@@ -29,14 +30,15 @@ class VehicleDetailPage extends StatelessWidget {
           Positioned.fill(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeroImage(),
+                    _buildImageCarousel(), // Carrossel das imagens
                     const SizedBox(height: 20),
                     Text(
-                      vehicle['name']!,
+                      vehicleName,
                       style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -48,7 +50,7 @@ class VehicleDetailPage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          vehicle['price']!,
+                          'R\$ ${vehicle['price'] ?? 'Preço Indefinido'}',
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -57,7 +59,7 @@ class VehicleDetailPage extends StatelessWidget {
                         ),
                         Chip(
                           label: Text(
-                            'Ano: ${vehicle['year']}',
+                            'Ano: ${vehicle['year'] ?? 'Ano Indefinido'}',
                             style: const TextStyle(fontSize: 14),
                           ),
                           backgroundColor: Colors.blue.shade100,
@@ -83,42 +85,63 @@ class VehicleDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildHeroImage() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: Hero(
-        tag: vehicle['name']!,
-        child: Image.network(
-          vehicle['image']!,
-          fit: BoxFit.cover,
-          height: 400,
-          width: double.infinity,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Container(
-              height: 400,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blueGrey, Colors.grey],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              child: const Center(child: CircularProgressIndicator()),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              color: Colors.grey[200],
-              height: 400,
-              width: double.infinity,
-              child: const Center(
-                child: Icon(Icons.error, color: Colors.red, size: 60),
-              ),
-            );
-          },
+  Widget _buildImageCarousel() {
+    List<String> imageUrls = [];
+
+    // Verifica e carrega as URLs de imagens
+    if (vehicle['imageUrls'] != null) {
+      if (vehicle['imageUrls'] is String) {
+        // Se for uma string, divide pelas vírgulas e remove espaços em branco extras
+        imageUrls = (vehicle['imageUrls'] as String)
+            .split(',')
+            .map((url) => url.trim()) // Remove espaços ao redor da URL
+            .where((url) =>
+                url.isNotEmpty &&
+                Uri.tryParse(url)?.hasAbsolutePath ==
+                    true) // Verifica se a URL é válida
+            .toList();
+      } else if (vehicle['imageUrls'] is List) {
+        // Se já for uma lista, converte para List<String>
+        imageUrls = List<String>.from(vehicle['imageUrls'])
+            .map((url) => url.trim())
+            .where((url) =>
+                url.isNotEmpty && Uri.tryParse(url)?.hasAbsolutePath == true)
+            .toList();
+      }
+    }
+
+    // Se a lista de URLs estiver vazia, exibe uma mensagem
+    if (imageUrls.isEmpty) {
+      return Container(
+        height: 400,
+        color: Colors.grey[200],
+        child: const Center(
+          child: Text(
+            'Nenhuma imagem disponível',
+            style: TextStyle(fontSize: 18, color: Colors.grey),
+          ),
         ),
+      );
+    }
+
+    return CarouselSlider.builder(
+      itemCount: imageUrls.length,
+      itemBuilder: (context, index, realIndex) {
+        String imageUrl = imageUrls[index];
+
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Image.network(
+            imageUrl,
+            fit: BoxFit.cover,
+            width: double.infinity,
+          ),
+        );
+      },
+      options: CarouselOptions(
+        height: 400,
+        enlargeCenterPage: true,
+        viewportFraction: 0.8,
       ),
     );
   }
@@ -142,7 +165,7 @@ class VehicleDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              vehicle['details']!,
+              vehicle['description'] ?? 'Descrição Indefinida',
               style: const TextStyle(
                 fontSize: 16,
                 color: Colors.black87,
@@ -159,9 +182,12 @@ class VehicleDetailPage extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildDetailIcon(Icons.speed, 'Quilometragem: ${vehicle['mileage']}'),
-        _buildDetailIcon(Icons.color_lens, 'Cor: ${vehicle['color']}'),
-        _buildDetailIcon(Icons.local_gas_station, 'Combustível: ${vehicle['fuel']}'),
+        _buildDetailIcon(
+            Icons.speed, 'Quilometragem: ${vehicle['mileage'] ?? '0 km'}'),
+        _buildDetailIcon(
+            Icons.color_lens, 'Cor: ${vehicle['color'] ?? 'Indefinido'}'),
+        _buildDetailIcon(Icons.local_gas_station,
+            'Combustível: ${vehicle['fuel'] ?? 'Indefinido'}'),
       ],
     );
   }
@@ -178,7 +204,8 @@ class VehicleDetailPage extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
             backgroundColor: Colors.green.shade600,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
             shadowColor: Colors.black45,
             elevation: 10,
           ),

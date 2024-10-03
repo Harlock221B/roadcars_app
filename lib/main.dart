@@ -88,7 +88,7 @@ class _MainPageState extends State<MainPage> {
         final List<Widget> pages = [
           HomeScreen(),
           const CatalogPage(),
-          isLoggedIn ? ProfileScreen() : const LoginScreen(),
+          isLoggedIn ? const ProfileScreen() : const LoginScreen(),
         ];
 
         return Scaffold(
@@ -100,7 +100,7 @@ class _MainPageState extends State<MainPage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => AddCarScreen()),
+                MaterialPageRoute(builder: (context) => const AddCarScreen()),
               );
             },
             backgroundColor: Colors.blue.shade800,
