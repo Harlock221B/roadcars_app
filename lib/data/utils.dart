@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 List<String> brands = [
     'Toyota',
     'Ford',
@@ -33,10 +35,10 @@ List<String> brands = [
    // Tipos de combustível
   List<String> transmissions = ['Automático', 'Manual', 'CVT']; // Câmbios
 
-  List<String> colors = [
-    'Preto',
-    'Branco',
-    'Prata',
-    'Azul',
-    'Vermelho'
-  ]; // Cores
+  Map<String, Color> colors = {
+    'black': Colors.black,
+    'white': Colors.white,
+    'silver': Colors.grey,
+    'blue': Colors.blue,
+    'red': Colors.red,
+  };

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:roadcarsapp/view/screens/VehicleDetailPage.dart';
+import 'package:roadcarsapp/view/screens/vehicle_detail_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class VehicleCard extends StatelessWidget {
