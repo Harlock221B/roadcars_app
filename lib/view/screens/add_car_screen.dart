@@ -79,104 +79,105 @@ class _AddCarScreenState extends State<AddCarScreen> {
   }
 
   Widget _buildImagePicker() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.center, // Centraliza o conteúdo
-    children: [
-      const Text(
-        'Imagens do Carro',
-        style: TextStyle(
-          fontSize: 18, 
-          fontWeight: FontWeight.bold,
-          color: Colors.black87,  // Cor de texto mais elegante
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center, // Centraliza o conteúdo
+      children: [
+        const Text(
+          'Imagens do Carro',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87, // Cor de texto mais elegante
+          ),
+          textAlign: TextAlign.center, // Centraliza o texto
         ),
-        textAlign: TextAlign.center, // Centraliza o texto
-      ),
-      const SizedBox(height: 16),  // Mais espaço entre o título e o grid
-      GridView.builder(
-        shrinkWrap: true,
-        itemCount: (_carImages.length + 1) > 6
-            ? _carImages.length
-            : _carImages.length + 1,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          crossAxisSpacing: 16, // Mais espaço entre os quadrados
-          mainAxisSpacing: 16,  // Mais espaço entre os quadrados
-        ),
-        itemBuilder: (context, index) {
-          if (index < _carImages.length) {
-            return Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12), // Bordas suavizadas
-                  child: Image.memory(
-                    _carImages[index],
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
+        const SizedBox(height: 16), // Mais espaço entre o título e o grid
+        GridView.builder(
+          shrinkWrap: true,
+          itemCount: (_carImages.length + 1) > 6
+              ? _carImages.length
+              : _carImages.length + 1,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: 16, // Mais espaço entre os quadrados
+            mainAxisSpacing: 16, // Mais espaço entre os quadrados
+          ),
+          itemBuilder: (context, index) {
+            if (index < _carImages.length) {
+              return Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius:
+                        BorderRadius.circular(12), // Bordas suavizadas
+                    child: Image.memory(
+                      _carImages[index],
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
                   ),
-                ),
-                Positioned(
-                  top: 6,  // Ajuste fino na posição do ícone de remover
-                  right: 6,
-                  child: GestureDetector(
-                    onTap: () => _removeImage(index),
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Colors.black54,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.close,
-                        color: Colors.white,
-                        size: 20,
+                  Positioned(
+                    top: 6, // Ajuste fino na posição do ícone de remover
+                    right: 6,
+                    child: GestureDetector(
+                      onTap: () => _removeImage(index),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            );
-          } else if (index == _carImages.length && _carImages.length < 6) {
-            // Placeholder visual para adicionar mais imagens
-            return GestureDetector(
-              onTap: _pickImages,
-              child: DottedBorder(
-                borderType: BorderType.RRect,
-                radius: const Radius.circular(12),
-                dashPattern: const [6, 3],
-                color: Colors.grey[400]!,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(
-                        Icons.add_a_photo,
-                        color: Colors.grey,
-                        size: 32,
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Adicionar mais fotos',
-                        style: TextStyle(
+                ],
+              );
+            } else if (index == _carImages.length && _carImages.length < 6) {
+              // Placeholder visual para adicionar mais imagens
+              return GestureDetector(
+                onTap: _pickImages,
+                child: DottedBorder(
+                  borderType: BorderType.RRect,
+                  radius: const Radius.circular(12),
+                  dashPattern: const [6, 3],
+                  color: Colors.grey[400]!,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(
+                          Icons.add_a_photo,
                           color: Colors.grey,
-                          fontSize: 14,
+                          size: 32,
                         ),
-                        textAlign: TextAlign.center, // Centraliza o texto
-                      ),
-                    ],
+                        SizedBox(height: 8),
+                        Text(
+                          'Adicionar mais fotos',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.center, // Centraliza o texto
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          } else {
-            return const SizedBox.shrink(); // Se o número de imagens for superior a 6
-          }
-        },
-      ),
-    ],
-  );
-}
-
+              );
+            } else {
+              return const SizedBox
+                  .shrink(); // Se o número de imagens for superior a 6
+            }
+          },
+        ),
+      ],
+    );
+  }
 
   void _removeImage(int index) {
     setState(() {
@@ -304,7 +305,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
             child: Form(
               key: _formKey,
               child: ListView(
-                physics: BouncingScrollPhysics(),
+                physics: const BouncingScrollPhysics(),
                 children: [
                   _buildDropdownField('Marca', _selectedBrand, brands, (value) {
                     setState(() {
@@ -337,8 +338,10 @@ class _AddCarScreenState extends State<AddCarScreen> {
                   _buildTextField(_kmController, 'KM Rodados'),
                   const SizedBox(height: 16),
                   SwitchListTile(
-                    title: const Text('Blindado',
-                        style: TextStyle(fontWeight: FontWeight.w500)),
+                    title: const Text(
+                      'Blindado',
+                      style: TextStyle(fontWeight: FontWeight.w500),
+                    ),
                     value: _isArmored,
                     onChanged: (bool value) {
                       setState(() {
@@ -363,23 +366,42 @@ class _AddCarScreenState extends State<AddCarScreen> {
     );
   }
 
-  Widget _buildDropdownField(String label, String currentValue,
-      List<String> items, ValueChanged<String?> onChanged) {
+  Widget _buildDropdownField(String label, String? selectedValue,
+      List<String> options, ValueChanged<String?> onChanged) {
     return DropdownButtonFormField<String>(
-      value: currentValue,
-      items: items.map((String value) {
+      value: selectedValue,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(
+          fontSize: 14,
+          color: Colors.grey,
+          fontWeight: FontWeight.w400,
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+        enabledBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.blueGrey, width: 2),
+        ),
+      ),
+      style: const TextStyle(
+        fontSize: 16,
+        color: Colors.black87,
+        fontWeight: FontWeight.w500,
+      ),
+      icon: const Icon(
+        Icons.arrow_drop_down,
+        color: Colors.blueGrey,
+      ),
+      items: options.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
         );
       }).toList(),
       onChanged: onChanged,
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
+      dropdownColor: Colors.white,
     );
   }
 
@@ -388,10 +410,24 @@ class _AddCarScreenState extends State<AddCarScreen> {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
+      style: const TextStyle(
+        fontSize: 16,
+        color: Colors.black87,
+        fontWeight: FontWeight.w500,
+      ),
       decoration: InputDecoration(
         labelText: label,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+        labelStyle: const TextStyle(
+          fontSize: 14,
+          color: Colors.grey,
+          fontWeight: FontWeight.w400,
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+        enabledBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+        focusedBorder: const UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.blueGrey, width: 2),
         ),
       ),
       validator: (value) {
