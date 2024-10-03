@@ -25,6 +25,8 @@ class _AddCarScreenState extends State<AddCarScreen> {
   final TextEditingController _kmController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _modelController = TextEditingController();
+  final TextEditingController _yearController = TextEditingController();
 
   List<Uint8List> _carImages = [];
   List<String> _carImageUrls = [];
@@ -246,11 +248,13 @@ class _AddCarScreenState extends State<AddCarScreen> {
       try {
         DocumentReference carDoc = await _firestore.collection('cars').add({
           'brand': _selectedBrand,
+          'model': _modelController.text,
           'motor': _selectedMotor,
           'fuel': _selectedFuel,
           'transmission': _selectedTransmission,
           'color': _selectedColor,
           'km': _kmController.text,
+          'year': _yearController.text,
           'armored': _isArmored,
           'price': _priceController.text,
           'description': _descriptionController.text,
@@ -313,6 +317,8 @@ class _AddCarScreenState extends State<AddCarScreen> {
                     });
                   }),
                   const SizedBox(height: 16),
+                  _buildTextField(_modelController, 'Modelo'),
+                  const SizedBox(height: 16),
                   _buildDropdownField('Motor', _selectedMotor, motors, (value) {
                     setState(() {
                       _selectedMotor = value!;
@@ -332,6 +338,8 @@ class _AddCarScreenState extends State<AddCarScreen> {
                       _selectedTransmission = value!;
                     });
                   }),
+                  const SizedBox(height: 16),
+                  _buildTextField(_yearController, 'Ano'),
                   const SizedBox(height: 16),
                   _buildColorSelection(),
                   const SizedBox(height: 16),
