@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../components/appbar/appbar_roadcarsapp.dart';
+import '../../components/drawer/drawer_roadcarsapp.dart';
+
 class HomeScreen extends StatelessWidget {
   final List<String> imgList = [
     'https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Nissan_Skyline_R34_GT-R_N%C3%BCr_001.jpg/640px-Nissan_Skyline_R34_GT-R_N%C3%BCr_001.jpgr',
@@ -12,10 +15,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Road Cars Consulting'),
-        elevation: 0,
-      ),
+      appBar: const MainAppBarRoadCars(),
+      drawer: const MainDrawerRoadCars(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -158,8 +159,8 @@ class HomeScreen extends StatelessWidget {
             child: Text.rich(
               TextSpan(
                 text: '$title\n',
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 16),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 children: [
                   TextSpan(
                     text: description,
@@ -184,7 +185,9 @@ class HomeScreen extends StatelessWidget {
         Text(
           number,
           style: const TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.blueAccent),
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.blueAccent),
         ),
         Text(
           label,
