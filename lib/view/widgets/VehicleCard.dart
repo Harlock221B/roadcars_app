@@ -4,28 +4,21 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 class VehicleCard extends StatelessWidget {
   final Map<String, dynamic> vehicle;
+  final String carId;
 
-  const VehicleCard({super.key, required this.vehicle});
+  const VehicleCard({super.key, required this.vehicle, required this.carId});
 
   @override
   Widget build(BuildContext context) {
-    // Verifica se há URLs de imagem disponíveis e trata o caso onde o campo pode estar vazio ou nulo
-    String imageUrl = (vehicle['imageUrls'] != null &&
-            vehicle['imageUrls'].isNotEmpty &&
-            vehicle['imageUrls'][0] != null)
-        ? vehicle['imageUrls'][0] // Primeira imagem da lista
-        : 'assets/images/fallback_image.jpg'; // Imagem de fallback
+    final String imageUrl = vehicle['imageUrls'][0];
 
     return GestureDetector(
       onTap: () {
-        // Navegar com animação para a tela de detalhes do veículo
         Navigator.push(
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                VehicleDetailsPage(
-                    vehicle: vehicle
-                        .map((key, value) => MapEntry(key, value.toString()))),
+                VehicleDetailsPage(carId: carId),
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
               const begin = Offset(0.0, 1.0);
@@ -44,38 +37,35 @@ class VehicleCard extends StatelessWidget {
       child: Card(
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(12),
         ),
-        margin: const EdgeInsets.symmetric(vertical: 15),
+        margin: const EdgeInsets.symmetric(vertical: 12),
         color: Colors.white,
-        elevation: 8,
-        shadowColor: Colors.black.withOpacity(0.2),
+        elevation: 4,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
-                // Utilizando CachedNetworkImage para carregar a imagem do Firebase Storage
                 CachedNetworkImage(
                   imageUrl: imageUrl,
                   placeholder: (context, url) => const Center(
-                    child:
-                        CircularProgressIndicator(), // Exibe um indicador de carregamento enquanto a imagem é carregada
+                    child: CircularProgressIndicator(),
                   ),
                   errorWidget: (context, url, error) => Image.asset(
-                    'assets/images/fallback_image.jpg', // Exibe a imagem de fallback caso ocorra algum erro
+                    'assets/images/fallback_image.jpg',
                     fit: BoxFit.cover,
                   ),
                   fit: BoxFit.cover,
                   width: double.infinity,
-                  height: 200,
+                  height: 180,
                 ),
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Colors.black.withOpacity(0.5),
+                          Colors.black.withOpacity(0.6),
                           Colors.transparent,
                         ],
                         begin: Alignment.bottomCenter,
@@ -84,54 +74,29 @@ class VehicleCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.favorite_border,
-                      color: Colors.white.withOpacity(0.9),
-                      size: 30,
-                    ),
-                    onPressed: () {
-                      // Função para favoritar o veículo
-                    },
-                  ),
-                ),
-                Positioned(
-                  bottom: 10,
-                  left: 10,
-                  child: Text(
-                    "${vehicle['brand']} ${vehicle['model']}", // Exibe marca e modelo
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      shadows: [
-                        Shadow(
-                          blurRadius: 5,
-                          color: Colors.black54,
-                          offset: Offset(2, 2),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
+                    "${vehicle['brand']} ${vehicle['model']}",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
                     vehicle['description'] ?? "Sem descrição",
                     style: TextStyle(
-                      fontSize: 16,
-                      color: Colors
-                          .grey[700], // Um cinza mais claro para contraste
+                      fontSize: 14,
+                      color: Colors.grey[600],
                     ),
-                    maxLines: 3,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 10),
@@ -141,49 +106,19 @@ class VehicleCard extends StatelessWidget {
                       Text(
                         "R\$ ${vehicle['price']}",
                         style: const TextStyle(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blueAccent, // Um tom de azul mais suave
+                          color: Color(0xFF6A8EAE), // Azul acinzentado
                         ),
                       ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => VehicleDetailsPage(
-                                  vehicle: vehicle.map((key, value) =>
-                                      MapEntry(key, value.toString()))),
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
-                          child: Text(
-                            'Ver Detalhes',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
+                      Text(
+                        "Ano: ${vehicle['year']}",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    "Ano: ${vehicle['year']}",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[700],
-                    ),
                   ),
                 ],
               ),

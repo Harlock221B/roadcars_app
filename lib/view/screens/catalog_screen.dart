@@ -68,7 +68,7 @@ class _CatalogPageState extends State<CatalogPage> {
           var vehicles = snapshot.data!.docs;
 
           return Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(8.0),
             child: ListView.builder(
               itemCount: vehicles.length,
               itemBuilder: (context, index) {
@@ -82,6 +82,7 @@ class _CatalogPageState extends State<CatalogPage> {
                     child: Material(
                       elevation: 8,
                       child: VehicleCard(
+                        carId: vehicle.id,
                         vehicle: {
                           'brand': vehicle['brand'],
                           'model': vehicle['model'],

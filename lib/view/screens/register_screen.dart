@@ -71,7 +71,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Cadastro de Usuário")),
+      appBar: AppBar(title: const Text("")),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
