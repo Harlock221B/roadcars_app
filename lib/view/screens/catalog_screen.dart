@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:roadcarsapp/components/appbar/appbar_roadcarsapp.dart';
 import 'package:roadcarsapp/components/vehicle/vehicle_card.dart';
 
 class CatalogPage extends StatefulWidget {
@@ -20,42 +21,43 @@ class _CatalogPageState extends State<CatalogPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text(
-          'Catálogo de Veículos',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF536976), Color(0xFF292e49)],
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight,
-            ),
-          ),
-        ),
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list,
-                color: Color.fromARGB(255, 215, 215, 214)),
-            onSelected: (String value) {
-              setState(() {
-                selectedFilter = value;
-              });
-            },
-            itemBuilder: (BuildContext context) {
-              return {'Preço', 'Nome'}.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child:
-                      Text(choice, style: const TextStyle(color: Colors.black)),
-                );
-              }).toList();
-            },
-          ),
-        ],
-      ),
+      appBar: MainAppBarRoadCars(),
+      // appBar: AppBar(
+      //   centerTitle: true,
+      //   title: const Text(
+      //     'Catálogo de Veículos',
+      //     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      //   ),
+      //   flexibleSpace: Container(
+      //     decoration: const BoxDecoration(
+      //       gradient: LinearGradient(
+      //         colors: [Color(0xFF536976), Color(0xFF292e49)],
+      //         begin: Alignment.bottomLeft,
+      //         end: Alignment.topRight,
+      //       ),
+      //     ),
+      //   ),
+      //   actions: [
+      //     PopupMenuButton<String>(
+      //       icon: const Icon(Icons.filter_list,
+      //           color: Color.fromARGB(255, 215, 215, 214)),
+      //       onSelected: (String value) {
+      //         setState(() {
+      //           selectedFilter = value;
+      //         });
+      //       },
+      //       itemBuilder: (BuildContext context) {
+      //         return {'Preço', 'Nome'}.map((String choice) {
+      //           return PopupMenuItem<String>(
+      //             value: choice,
+      //             child:
+      //                 Text(choice, style: const TextStyle(color: Colors.black)),
+      //           );
+      //         }).toList();
+      //       },
+      //     ),
+      //   ],
+      // ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _getVehicles(),
         builder: (context, snapshot) {
@@ -78,9 +80,7 @@ class _CatalogPageState extends State<CatalogPage> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: GestureDetector(
-                    onTap: () {
-                      // Ação ao tocar no card do veículo
-                    },
+                    onTap: () {},
                     child: Material(
                       elevation: 8,
                       child: VehicleCard(
