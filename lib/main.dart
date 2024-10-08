@@ -96,65 +96,6 @@ class _MainPageState extends State<MainPage> {
             duration: const Duration(milliseconds: 300),
             child: pages[_currentIndex],
           ),
-          // floatingActionButton: FloatingActionButton(
-          //   onPressed: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(builder: (context) => const AddCarScreen()),
-          //     );
-          //   },
-          //   backgroundColor: Colors.blue.shade800,
-          //   elevation: 5,
-          //   shape: RoundedRectangleBorder(
-          //     borderRadius: BorderRadius.circular(20),
-          //   ),
-          //   child: const Icon(
-          //     Icons.add,
-          //     size: 26,
-          //     color: Colors.white,
-          //   ),
-          // ),
-          // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-          // bottomNavigationBar: BottomAppBar(
-          //   shape: const CircularNotchedRectangle(),
-          //   notchMargin: 4.0, // Diminuído para evitar overflow
-          //   color: Colors.black,
-          //   child: SizedBox(
-          //     height: 56, // Diminuir a altura do BottomNavigationBar
-          //     child: BottomNavigationBar(
-          //       type: BottomNavigationBarType.fixed,
-          //       currentIndex: _currentIndex,
-          //       backgroundColor: Colors.black,
-          //       selectedItemColor: Colors.blueAccent,
-          //       unselectedItemColor: Colors.grey.shade400,
-          //       showSelectedLabels: true,
-          //       showUnselectedLabels: false,
-          //       selectedLabelStyle: const TextStyle(
-          //         fontWeight: FontWeight.w600,
-          //         fontSize: 12,
-          //       ),
-          //       onTap: (index) {
-          //         setState(() {
-          //           _currentIndex = index;
-          //         });
-          //       },
-          //       items: [
-          //         BottomNavigationBarItem(
-          //           icon: _customIcon(Icons.home, 0),
-          //           label: 'Home',
-          //         ),
-          //         BottomNavigationBarItem(
-          //           icon: _customIcon(Icons.car_rental, 1),
-          //           label: 'Catálogo',
-          //         ),
-          //         BottomNavigationBarItem(
-          //           icon: _customIcon(isLoggedIn ? Icons.person : Icons.login, 2),
-          //           label: isLoggedIn ? 'Perfil' : 'Login',
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
         );
       },
     );

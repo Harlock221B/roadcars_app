@@ -57,8 +57,12 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+      ),
+      backgroundColor: Colors.black,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -73,7 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -125,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       child: const Text(
                         'Esqueceu a senha?',
-                        style: TextStyle(color: Colors.blueAccent),
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
@@ -133,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ElevatedButton(
                     onPressed: _handleLogin,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: Colors.blueGrey.shade700,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 50,
                         vertical: 15,
@@ -151,7 +155,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      const Text("Não tem uma conta?"),
+                      const Text(
+                        "Não tem uma conta?",
+                        style: TextStyle(color: Colors.white),
+                      ),
                       TextButton(
                         onPressed: () {
                           // Navega para a tela de registro
@@ -164,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: const Text(
                           'Crie uma aqui!',
-                          style: TextStyle(color: Colors.blueAccent),
+                          style: TextStyle(color: Colors.blueGrey),
                         ),
                       ),
                     ],
@@ -190,15 +197,20 @@ class _LoginScreenState extends State<LoginScreen> {
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: Colors.blueAccent),
+        labelStyle: const TextStyle(color: Colors.white),
+        prefixIcon: Icon(icon, color: Colors.white),
+        filled: true,
+        fillColor: Colors.grey.shade800,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.white),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.blueAccent),
+          borderSide: const BorderSide(color: Colors.blueGrey),
         ),
       ),
       validator: validator,

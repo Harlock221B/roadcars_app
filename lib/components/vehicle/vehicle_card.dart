@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:roadcarsapp/view/screens/vehicle_detail_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:roadcarsapp/components/favoriteicon/favorite.dart';
 
 class VehicleCard extends StatelessWidget {
   final Map<String, dynamic> vehicle;
@@ -73,6 +74,12 @@ class VehicleCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                ),
+                // Adicionando o ícone de favorito
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: FavoriteIcon(carId: carId), // Componente reutilizável
                 ),
               ],
             ),

@@ -39,6 +39,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           'phone': _phoneController.text,
           'createdAt': Timestamp.now(),
           'profileImageUrl': '',
+          'favoritedCars': [],
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -71,7 +72,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("")),
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+      ),
+      backgroundColor: Colors.black,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -86,7 +92,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -145,18 +151,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   const SizedBox(height: 30),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: Colors.blueGrey.shade700,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 50,
                         vertical: 15,
                       ),
-                      textStyle: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     onPressed: _handleRegister,
-                    child: const Text('Registrar'),
+                    child: const Text(
+                      'Registrar',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
                   ),
                   const SizedBox(height: 20),
                 ],
@@ -180,11 +188,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon),
+        labelStyle: const TextStyle(color: Colors.white),
+        prefixIcon: Icon(icon, color: Colors.white),
+        filled: true,
+        fillColor: Colors.grey.shade800,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.white),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.blueGrey),
         ),
       ),
       validator: validator,

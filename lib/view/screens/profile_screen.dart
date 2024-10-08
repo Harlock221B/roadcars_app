@@ -159,7 +159,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   backgroundImage: _profileImage != null
                       ? FileImage(_profileImage!) // Exibe a imagem local
                       : (_profileImageUrl != null
-                          ? NetworkImage(_profileImageUrl!) // Exibe a imagem do Firebase
+                          ? NetworkImage(
+                              _profileImageUrl!) // Exibe a imagem do Firebase
                           : null),
                   child: _profileImage == null && _profileImageUrl == null
                       ? const Icon(Icons.camera_alt, size: 50)

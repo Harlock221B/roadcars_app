@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../widgets/VehicleCard.dart';
+import 'package:roadcarsapp/components/vehicle/vehicle_card.dart';
 
 class CatalogPage extends StatefulWidget {
   const CatalogPage({super.key});
@@ -37,7 +37,8 @@ class _CatalogPageState extends State<CatalogPage> {
         ),
         actions: [
           PopupMenuButton<String>(
-            icon: const Icon(Icons.filter_list, color: Color.fromARGB(255, 215, 215, 214)),
+            icon: const Icon(Icons.filter_list,
+                color: Color.fromARGB(255, 215, 215, 214)),
             onSelected: (String value) {
               setState(() {
                 selectedFilter = value;
@@ -47,7 +48,8 @@ class _CatalogPageState extends State<CatalogPage> {
               return {'Preço', 'Nome'}.map((String choice) {
                 return PopupMenuItem<String>(
                   value: choice,
-                  child: Text(choice, style: const TextStyle(color: Colors.black)),
+                  child:
+                      Text(choice, style: const TextStyle(color: Colors.black)),
                 );
               }).toList();
             },
