@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:roadcarsapp/view/screens/catalog_screen.dart';
+import 'package:roadcarsapp/view/screens/cars/catalog_screen.dart';
 import 'package:roadcarsapp/view/screens/home_screen.dart';
-import 'package:roadcarsapp/view/screens/login_screen.dart';
-import 'package:roadcarsapp/view/screens/profile_screen.dart';
+import 'package:roadcarsapp/view/screens/users/login_screen.dart';
+import 'package:roadcarsapp/view/screens/users/profile_screen.dart';
 
 class MainDrawerRoadCars extends StatefulWidget {
   const MainDrawerRoadCars({super.key});

@@ -3,10 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'components/appbar/appbar_roadcarsapp.dart';
 import 'firebase_options.dart';
-import './view/screens/login_screen.dart';
-import './view/screens/catalog_screen.dart';
+import 'view/screens/users/login_screen.dart';
+import 'view/screens/cars/catalog_screen.dart';
 import './view/screens/home_screen.dart';
-import './view/screens/profile_screen.dart';
+import 'view/screens/users/profile_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
