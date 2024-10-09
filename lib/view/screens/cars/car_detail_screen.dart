@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:roadcarsapp/view/screens/edit_car_screen.dart';
+import 'package:roadcarsapp/view/screens/cars/edit_car_screen.dart';
 import 'package:roadcarsapp/components/favoriteicon/favorite.dart';
 
 class VehicleDetailsPage extends StatelessWidget {
