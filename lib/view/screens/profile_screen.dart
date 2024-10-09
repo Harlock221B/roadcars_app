@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:roadcarsapp/components/vehicle/vehicle_card.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 
@@ -22,6 +23,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _displayName;
   String? _email;
   List<String> _favoritedCars = [];
+  List<Map<String, dynamic>> _favoritedCarDetails = [];
+  List<Map<String, dynamic>> _addedCarDetails = [];
+  bool _isVendor = false; // Inicialização da condição de vendedor
+  bool _isEditing = false;
 
   @override
   void initState() {
@@ -40,7 +45,207 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _displayName = userDoc['displayName'];
           _email = userDoc['email'];
           _favoritedCars = List<String>.from(userDoc['favoritedCars']);
+          _isVendor = userDoc['isVendor'] ?? false;
         });
+        _loadFavoritedCarDetails();
+        _loadAddedCars(); // Carregar carros adicionados
+      }
+    }
+  }
+
+  Future<void> _loadFavoritedCarDetails() async {
+    List<Map<String, dynamic>> carDetails = [];
+
+    for (String carId in _favoritedCars) {
+      try {
+        DocumentSnapshot carDoc =
+            await _firestore.collection('cars').doc(carId).get();
+
+        if (carDoc.exists) {
+          Map<String, dynamic> carData = carDoc.data() as Map<String, dynamic>;
+          carData['id'] = carId;
+          carDetails.add(carData);
+        }
+      } catch (e) {
+        print(
+            "Erro ao carregar detalhes do carro favoritado com ID $carId: $e");
+      }
+    }
+
+    setState(() {
+      _favoritedCarDetails = carDetails;
+    });
+  }
+
+  // Função para carregar os carros que o usuário adicionou
+  Future<void> _loadAddedCars() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('cars')
+          .where('userId', isEqualTo: user.uid)
+          .get();
+      List<Map<String, dynamic>> addedCars = querySnapshot.docs
+          .map((doc) => {...doc.data() as Map<String, dynamic>, 'id': doc.id})
+          .toList();
+
+      setState(() {
+        _addedCarDetails = addedCars;
+      });
+    }
+  }
+
+  void _editProfile() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+      ),
+      builder: (context) {
+        String newDisplayName = _displayName ?? '';
+        String newEmail = _email ?? '';
+
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                height: 5,
+                width: 40,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Editar Perfil',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Campo de nome
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Nome',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: const Icon(Icons.person),
+                ),
+                onChanged: (value) {
+                  newDisplayName = value;
+                },
+                controller: TextEditingController(text: _displayName),
+              ),
+              const SizedBox(height: 16),
+
+              // Campo de e-mail
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Email',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: const Icon(Icons.email),
+                ),
+                onChanged: (value) {
+                  newEmail = value;
+                },
+                controller: TextEditingController(text: _email),
+              ),
+              const SizedBox(height: 24),
+
+              // Botões
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      backgroundColor: Colors.grey[300],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Cancelar',
+                      style: TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await _saveProfile(newDisplayName, newEmail);
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Salvar',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _saveProfile(String newDisplayName, String newEmail) async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      try {
+        // Atualiza os dados do usuário no Firestore
+        await _firestore.collection('users').doc(user.uid).update({
+          'displayName': newDisplayName,
+          'email': newEmail,
+        });
+
+        // Atualiza o nome e o email no Firebase Authentication
+        await user.updateDisplayName(newDisplayName);
+        await user.updateEmail(newEmail);
+
+        // Recarrega as informações do usuário
+        await user.reload();
+
+        setState(() {
+          _displayName = newDisplayName;
+          _email = newEmail;
+          _isEditing = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Perfil atualizado com sucesso!')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao atualizar perfil: $e')),
+        );
       }
     }
   }
@@ -85,63 +290,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Widget _buildFavoritedCarsList() {
-    return _favoritedCars.isNotEmpty
-        ? Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                'Carros Favoritados',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 150,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _favoritedCars.length,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 8),
-                      width: 120,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.grey[200],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                _favoritedCars[index],
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    const Icon(Icons.car_rental, size: 50),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            'Car ${index + 1}',
-                            style: const TextStyle(color: Colors.black87),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          )
-        : const Text('Nenhum carro favoritado.');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,11 +298,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              setState(() {
+                _isEditing = true;
+              });
+              _editProfile(); // Chama a função de edição de perfil
+            },
+          ),
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding:
-              const EdgeInsets.only(left: 0, right: 0, top: 100, bottom: 600),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -220,7 +378,105 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     style: TextStyle(fontSize: 16, color: Colors.white)),
               ),
               const SizedBox(height: 30),
-              _buildFavoritedCarsList(),
+
+              // Seção de Carros Favoritados
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Carros Favoritados',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              _favoritedCarDetails.isNotEmpty
+                  ? ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: _favoritedCarDetails.length,
+                      itemBuilder: (context, index) {
+                        final vehicle = _favoritedCarDetails[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10.0),
+                          child: Material(
+                            elevation: 8,
+                            borderRadius: BorderRadius.circular(12),
+                            child: VehicleCard(
+                              carId: vehicle['id'],
+                              vehicle: {
+                                'brand': vehicle['brand'],
+                                'model': vehicle['model'],
+                                'year': vehicle['year'],
+                                'price': vehicle['price'],
+                                'description': vehicle['description'],
+                                'imageUrls':
+                                    vehicle['imageUrls'] as List<dynamic>,
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : const Text(
+                      'Você não favoritou nenhum carro ainda.',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+              const SizedBox(height: 30),
+
+              if (_isVendor)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Carros que você está vendendo',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _addedCarDetails.isNotEmpty
+                        ? ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: _addedCarDetails.length,
+                            itemBuilder: (context, index) {
+                              final addedCar = _addedCarDetails[index];
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                child: Material(
+                                  elevation: 8,
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: VehicleCard(
+                                    carId: addedCar['id'],
+                                    vehicle: {
+                                      'brand': addedCar['brand'],
+                                      'model': addedCar['model'],
+                                      'year': addedCar['year'],
+                                      'price': addedCar['price'],
+                                      'description': addedCar['description'],
+                                      'imageUrls': addedCar['imageUrls']
+                                          as List<dynamic>,
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : const Text(
+                            'Você não adicionou nenhum carro à venda.',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                  ],
+                ),
             ],
           ),
         ),

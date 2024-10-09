@@ -65,7 +65,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
     for (int i = 0; i < _carImages.length; i++) {
       try {
         Reference storageRef =
-            _storage.ref().child('carImages/$carId/${_selectedBrand}-$i.jpg');
+            _storage.ref().child('carImages/$carId/$_selectedBrand-$i.jpg');
         SettableMetadata metadata = SettableMetadata(contentType: 'image/jpeg');
         UploadTask uploadTask = storageRef.putData(_carImages[i], metadata);
         TaskSnapshot snapshot = await uploadTask;
@@ -148,10 +148,10 @@ class _AddCarScreenState extends State<AddCarScreen> {
                   radius: const Radius.circular(12),
                   dashPattern: const [6, 3],
                   color: Colors.grey[400]!,
-                  child: Center(
+                  child: const Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Icon(
                           Icons.add_a_photo,
                           color: Colors.grey,
@@ -246,6 +246,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
 
     if (_formKey.currentState!.validate()) {
       try {
+        // Adiciona o carro à coleção "cars"
         DocumentReference carDoc = await _firestore.collection('cars').add({
           'brand': _selectedBrand,
           'model': _modelController.text,
@@ -262,13 +263,23 @@ class _AddCarScreenState extends State<AddCarScreen> {
           'userId': _auth.currentUser!.uid,
         });
 
+        // Upload das imagens para o Storage
         _carImageUrls = await _uploadCarImagesToStorage(carDoc.id);
 
+        // Atualiza o documento do carro com as URLs das imagens
         if (_carImageUrls.isNotEmpty) {
           await carDoc.update({
             'imageUrls': _carImageUrls,
           });
         }
+
+        // Atualiza o documento do usuário, adicionando o carId na lista de carros registrados
+        await _firestore
+            .collection('users')
+            .doc(_auth.currentUser!.uid)
+            .update({
+          'registeredCars': FieldValue.arrayUnion([carDoc.id]),
+        });
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Carro adicionado com sucesso!')),

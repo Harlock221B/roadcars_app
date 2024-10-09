@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:roadcarsapp/components/appbar/appbar_roadcarsapp.dart';
 import '../../main.dart'; // Importe a tela de início
 import './register_screen.dart'; // Importe a tela de registro
 import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth

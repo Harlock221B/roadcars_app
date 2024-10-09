@@ -38,11 +38,12 @@ class VehicleCard extends StatelessWidget {
       child: Card(
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16), // Aumentar o arredondamento
         ),
-        margin: const EdgeInsets.symmetric(vertical: 12),
-        color: Colors.white,
-        elevation: 4,
+        margin: const EdgeInsets.symmetric(
+            vertical: 12, horizontal: 8), // Margens ajustadas
+        elevation: 3, // Sombra reduzida
+        shadowColor: Colors.black54, // Cor da sombra
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -59,14 +60,14 @@ class VehicleCard extends StatelessWidget {
                   ),
                   fit: BoxFit.cover,
                   width: double.infinity,
-                  height: 180,
+                  height: 200, // Altura ajustada
                 ),
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          Colors.black.withOpacity(0.6),
+                          Colors.black.withOpacity(0.5),
                           Colors.transparent,
                         ],
                         begin: Alignment.bottomCenter,
@@ -75,24 +76,24 @@ class VehicleCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Adicionando o ícone de favorito
                 Positioned(
-                  top: 10,
-                  right: 10,
-                  child: FavoriteIcon(carId: carId), // Componente reutilizável
+                  top: 12, // Ajuste na posição do ícone
+                  right: 12,
+                  child: FavoriteIcon(carId: carId),
                 ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              padding: const EdgeInsets.symmetric(
+                  vertical: 12, horizontal: 16), // Padding ajustado
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "${vehicle['brand']} ${vehicle['model']}",
                     style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 20, // Tamanho da fonte ajustado
+                      fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
                   ),
@@ -101,7 +102,7 @@ class VehicleCard extends StatelessWidget {
                     vehicle['description'] ?? "Sem descrição",
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.grey[600],
+                      color: Colors.grey[700], // Ajustar a cor
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -111,9 +112,9 @@ class VehicleCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "R\$ ${vehicle['price']}",
+                        "R\$ ${vehicle['price']}", // Formatação de preço
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF6A8EAE), // Azul acinzentado
                         ),
@@ -122,8 +123,32 @@ class VehicleCard extends StatelessWidget {
                         "Ano: ${vehicle['year']}",
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey[600],
+                          color: Colors.grey[700], // Ajustar a cor
                         ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  // Adicione ícones para características do veículo
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.local_gas_station,
+                          size: 16,
+                          color: Colors.grey[600]), // Ícone de combustível
+                      const SizedBox(width: 4),
+                      Text(
+                        vehicle['fuelType'] ?? "Gasolina",
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      ),
+                      const SizedBox(width: 16),
+                      Icon(Icons.drive_eta,
+                          size: 16,
+                          color: Colors.grey[600]), // Ícone de transmissão
+                      const SizedBox(width: 4),
+                      Text(
+                        vehicle['transmission'] ?? "Manual",
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                     ],
                   ),

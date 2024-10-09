@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import do Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:roadcarsapp/view/screens/catalog_screen.dart';
 import 'package:roadcarsapp/view/screens/home_screen.dart';
 import 'package:roadcarsapp/view/screens/login_screen.dart';
@@ -17,12 +17,12 @@ class MainDrawerRoadCars extends StatefulWidget {
 class _MainDrawerRoadCarsState extends State<MainDrawerRoadCars> {
   bool isLoggedIn = false;
   User? currentUser;
-  String userName = 'Usuário'; // Nome padrão caso não tenha dados do Firestore
+  String userName = 'Usuário';
+  String? profileImageUrl;
 
   @override
   void initState() {
     super.initState();
-    // Verifica se o usuário está logado
     currentUser = FirebaseAuth.instance.currentUser;
     setState(() {
       isLoggedIn = currentUser != null;
@@ -37,6 +37,7 @@ class _MainDrawerRoadCarsState extends State<MainDrawerRoadCars> {
         if (documentSnapshot.exists) {
           setState(() {
             userName = documentSnapshot['displayName'] ?? 'Usuário';
+            profileImageUrl = documentSnapshot['profileImageUrl'];
           });
         }
       }).catchError((error) {
@@ -59,7 +60,7 @@ class _MainDrawerRoadCarsState extends State<MainDrawerRoadCars> {
                 if (isLoggedIn) {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => ProfileScreen(),
+                      builder: (context) => const ProfileScreen(),
                     ),
                   );
                 }
@@ -67,60 +68,45 @@ class _MainDrawerRoadCarsState extends State<MainDrawerRoadCars> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (isLoggedIn && currentUser != null)
-                    Row(
-                      children: [
+                  Row(
+                    children: [
+                      // Imagem da Road Cars
+                      Image.network(
+                        'https://roadcars.com.br/static/photos/logo/brand.png',
+                        width: 80,
+                      ),
+                      const Spacer(),
+                      // Avatar do usuário logado
+                      if (isLoggedIn && currentUser != null)
                         CircleAvatar(
                           radius: 25,
-                          backgroundImage: currentUser?.photoURL != null
-                              ? NetworkImage(currentUser!.photoURL!)
+                          backgroundImage: profileImageUrl != null
+                              ? NetworkImage(profileImageUrl!)
                               : null,
-                          child: currentUser?.photoURL == null
-                              ? Icon(Icons.person,
+                          child: profileImageUrl == null
+                              ? const Icon(Icons.person,
                                   size: 30, color: Colors.white)
                               : null,
                         ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              userName,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            Text(
-                              currentUser!.email ?? '',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    )
-                  else
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Image.network(
-                          'https://roadcars.com.br/static/photos/logo/brand.png',
-                          width: 100,
-                        ),
-                        const SizedBox(height: 25),
-                        const Text(
-                          'Seja bem-vindo(a) ao app da Road Cars Consulting',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  // Mensagem abaixo do avatar e logo
+                  if (isLoggedIn && currentUser != null) ...[
+                    Text(
+                      'Seja bem-vindo(a) ao app da Road Cars Consulting, $userName',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
+                  ] else ...[
+                    const Text(
+                      'Seja bem-vindo(a) ao app da Road Cars Consulting',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -146,8 +132,6 @@ class _MainDrawerRoadCarsState extends State<MainDrawerRoadCars> {
               height: 28,
             ),
             title: const Text('Veículos'),
-            trailing: const Icon(Icons.expand_more_outlined),
-            shape: Border.all(style: BorderStyle.none),
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 20),
@@ -159,8 +143,7 @@ class _MainDrawerRoadCarsState extends State<MainDrawerRoadCars> {
                         height: 22,
                       ),
                       title: const Text('Catálogo de Veículos'),
-                      onTap: () async {
-                        Navigator.pop(context);
+                      onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => const CatalogPage(),

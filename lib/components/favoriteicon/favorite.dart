@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class FavoriteIcon extends StatefulWidget {
   final String carId;
 
-  const FavoriteIcon({Key? key, required this.carId}) : super(key: key);
+  const FavoriteIcon({super.key, required this.carId});
 
   @override
   _FavoriteIconState createState() => _FavoriteIconState();

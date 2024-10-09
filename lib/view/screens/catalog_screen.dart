@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Importar para autenticação
 import 'package:roadcarsapp/components/appbar/appbar_roadcarsapp.dart';
 import 'package:roadcarsapp/components/vehicle/vehicle_card.dart';
+import 'add_car_screen.dart'; // Import da tela de adicionar carros
 
 class CatalogPage extends StatefulWidget {
   const CatalogPage({super.key});
@@ -13,6 +15,28 @@ class CatalogPage extends StatefulWidget {
 class _CatalogPageState extends State<CatalogPage> {
   String selectedFilter = 'Preço';
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  bool vendor = false; // Inicialização da condição de vendedor
+
+  @override
+  void initState() {
+    super.initState();
+    _checkIfUserIsVendor();
+  }
+
+  Future<void> _checkIfUserIsVendor() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      // Verificar se o usuário existe no Firestore e obter o status de vendedor
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        setState(() {
+          vendor = userDoc['isVendor'] ??
+              false; // Assume false se o campo não existir
+        });
+      }
+    }
+  }
 
   Stream<QuerySnapshot> _getVehicles() {
     return _firestore.collection('cars').snapshots();
@@ -21,43 +45,7 @@ class _CatalogPageState extends State<CatalogPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MainAppBarRoadCars(),
-      // appBar: AppBar(
-      //   centerTitle: true,
-      //   title: const Text(
-      //     'Catálogo de Veículos',
-      //     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-      //   ),
-      //   flexibleSpace: Container(
-      //     decoration: const BoxDecoration(
-      //       gradient: LinearGradient(
-      //         colors: [Color(0xFF536976), Color(0xFF292e49)],
-      //         begin: Alignment.bottomLeft,
-      //         end: Alignment.topRight,
-      //       ),
-      //     ),
-      //   ),
-      //   actions: [
-      //     PopupMenuButton<String>(
-      //       icon: const Icon(Icons.filter_list,
-      //           color: Color.fromARGB(255, 215, 215, 214)),
-      //       onSelected: (String value) {
-      //         setState(() {
-      //           selectedFilter = value;
-      //         });
-      //       },
-      //       itemBuilder: (BuildContext context) {
-      //         return {'Preço', 'Nome'}.map((String choice) {
-      //           return PopupMenuItem<String>(
-      //             value: choice,
-      //             child:
-      //                 Text(choice, style: const TextStyle(color: Colors.black)),
-      //           );
-      //         }).toList();
-      //       },
-      //     ),
-      //   ],
-      // ),
+      appBar: const MainAppBarRoadCars(),
       body: StreamBuilder<QuerySnapshot>(
         stream: _getVehicles(),
         builder: (context, snapshot) {
@@ -102,6 +90,21 @@ class _CatalogPageState extends State<CatalogPage> {
           );
         },
       ),
+      // Floating Action Button para adicionar carros (somente se for vendedor)
+      floatingActionButton: vendor
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AddCarScreen()),
+                );
+              },
+              backgroundColor: const Color(0xFF607D8B), // Cinza azulado
+              child: const Icon(Icons.add, color: Colors.white),
+              elevation: 10,
+              tooltip: 'Adicionar Veículo',
+            )
+          : null,
     );
   }
 }
