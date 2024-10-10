@@ -39,7 +39,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           'phone': _phoneController.text,
           'createdAt': Timestamp.now(),
           'profileImageUrl': '',
-          'vendor': false,
+          'isVendor': false,
           'favoritedCars': [],
         });
 
