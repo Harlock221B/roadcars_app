@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:roadcarsapp/data/utils.dart';
 
-class ColorSelection extends StatefulWidget {
-  const ColorSelection({Key? key}) : super(key: key);
+class ColorSelection extends StatelessWidget {
+  final String selectedColor;
+  final Map<String, Color> colors;
+  final ValueChanged<String> onColorSelected;
 
-  @override
-  _ColorSelectionState createState() => _ColorSelectionState();
-}
-
-class _ColorSelectionState extends State<ColorSelection> {
-  String _selectedColor = 'black';
+  const ColorSelection({
+    required this.selectedColor,
+    required this.colors,
+    required this.onColorSelected,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return _buildColorSelection();
-  }
-
-  Widget _buildColorSelection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -26,25 +23,20 @@ class _ColorSelectionState extends State<ColorSelection> {
         ),
         const SizedBox(height: 12),
         Wrap(
-          spacing: 12, // Espaçamento horizontal entre os círculos
-          runSpacing: 12, // Espaçamento vertical entre os círculos
+          spacing: 12,
+          runSpacing: 12,
           children: colors.entries.map((entry) {
             return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedColor = entry.key;
-                });
-              },
+              onTap: () => onColorSelected(entry.key),
               child: Tooltip(
-                message: entry.key, // Mostra o nome da cor ao passar o dedo
+                message: entry.key,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
-                  padding: const EdgeInsets.all(3), // Espaço para a borda
+                  padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: _selectedColor == entry.key
+                      color: selectedColor == entry.key
                           ? Colors.blueAccent
                           : Colors.grey.shade300,
                       width: 2.0,
@@ -52,7 +44,7 @@ class _ColorSelectionState extends State<ColorSelection> {
                   ),
                   child: CircleAvatar(
                     backgroundColor: entry.value,
-                    radius: 22, // Tamanho dos círculos
+                    radius: 22,
                   ),
                 ),
               ),

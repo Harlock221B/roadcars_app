@@ -349,7 +349,7 @@ class _EditCarScreenState extends State<EditCarScreen> {
         Wrap(
           spacing: 12, // Espaçamento horizontal entre os círculos
           runSpacing: 12, // Espaçamento vertical entre os círculos
-          children: colors.entries.map((entry) {
+          children: carColors.entries.map((entry) {
             return GestureDetector(
               onTap: () {
                 setState(() {

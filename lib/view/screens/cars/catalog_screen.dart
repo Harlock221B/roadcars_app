@@ -99,10 +99,10 @@ class _CatalogPageState extends State<CatalogPage> {
                   MaterialPageRoute(builder: (context) => const AddCarScreen()),
                 );
               },
-              backgroundColor: const Color(0xFF607D8B), // Cinza azulado
-              child: const Icon(Icons.add, color: Colors.white),
+              backgroundColor: const Color(0xFF607D8B),
               elevation: 10,
-              tooltip: 'Adicionar Veículo',
+              tooltip: 'Adicionar Veículo', // Cinza azulado
+              child: const Icon(Icons.add, color: Colors.white),
             )
           : null,
     );

@@ -3,6 +3,9 @@ import 'package:roadcarsapp/data/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:roadcarsapp/components/color_selection/color_selection.dart';
+import 'package:roadcarsapp/components/utils/dropdown_field.dart';
+import 'package:roadcarsapp/components/utils/text_field.dart';
 import 'dart:typed_data';
 import 'package:firebase_auth/firebase_auth.dart'; // Adicionado para autenticação
 import 'package:dotted_border/dotted_border.dart'; // Adicionado para borda pontilhada
@@ -187,53 +190,6 @@ class _AddCarScreenState extends State<AddCarScreen> {
     });
   }
 
-  Widget _buildColorSelection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Cor',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 12, // Espaçamento horizontal entre os círculos
-          runSpacing: 12, // Espaçamento vertical entre os círculos
-          children: colors.entries.map((entry) {
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedColor = entry.key;
-                });
-              },
-              child: Tooltip(
-                message: entry.key, // Mostra o nome da cor ao passar o dedo
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
-                  padding: const EdgeInsets.all(3), // Espaço para a borda
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: _selectedColor == entry.key
-                          ? Colors.blueAccent
-                          : Colors.grey.shade300,
-                      width: 2.0,
-                    ),
-                  ),
-                  child: CircleAvatar(
-                    backgroundColor: entry.value,
-                    radius: 22, // Tamanho dos círculos
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
   Future<void> _addCar() async {
     if (_auth.currentUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -322,39 +278,67 @@ class _AddCarScreenState extends State<AddCarScreen> {
               child: ListView(
                 physics: const BouncingScrollPhysics(),
                 children: [
-                  _buildDropdownField('Marca', _selectedBrand, brands, (value) {
-                    setState(() {
-                      _selectedBrand = value!;
-                    });
-                  }),
+                  DropdownField(
+                    label: 'Marca',
+                    selectedValue: _selectedBrand,
+                    options: brands,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedBrand = value!;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 16),
-                  _buildTextField(_modelController, 'Modelo'),
+                  CustomTextField(
+                    controller: _modelController,
+                    label: 'Modelo',
+                  ),
                   const SizedBox(height: 16),
-                  _buildDropdownField('Motor', _selectedMotor, motors, (value) {
-                    setState(() {
-                      _selectedMotor = value!;
-                    });
-                  }),
+                  DropdownField(
+                    label: 'Motor',
+                    selectedValue: _selectedMotor,
+                    options: motors,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedMotor = value!;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 16),
-                  _buildDropdownField('Combustível', _selectedFuel, fuelTypes,
-                      (value) {
-                    setState(() {
-                      _selectedFuel = value!;
-                    });
-                  }),
+                  DropdownField(
+                      label: 'Combustível',
+                      selectedValue: _selectedFuel,
+                      options: fuelTypes,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedFuel = value!;
+                        });
+                      }),
                   const SizedBox(height: 16),
-                  _buildDropdownField(
-                      'Câmbio', _selectedTransmission, transmissions, (value) {
-                    setState(() {
-                      _selectedTransmission = value!;
-                    });
-                  }),
+                  DropdownField(
+                      label: 'Câmbio',
+                      selectedValue: _selectedTransmission,
+                      options: transmissions,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedTransmission = value!;
+                        });
+                      }),
                   const SizedBox(height: 16),
-                  _buildTextField(_yearController, 'Ano'),
+                  CustomTextField(controller: _yearController, label: 'Ano'),
                   const SizedBox(height: 16),
-                  _buildColorSelection(),
+                  ColorSelection(
+                    selectedColor: _selectedColor,
+                    colors: carColors,
+                    onColorSelected: (color) {
+                      setState(() {
+                        _selectedColor = color;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 16),
-                  _buildTextField(_kmController, 'KM Rodados'),
+                  CustomTextField(
+                      controller: _kmController, label: 'KM Rodados'),
                   const SizedBox(height: 16),
                   SwitchListTile(
                     title: const Text(
@@ -370,9 +354,11 @@ class _AddCarScreenState extends State<AddCarScreen> {
                     activeColor: Colors.blueGrey,
                   ),
                   const SizedBox(height: 16),
-                  _buildTextField(_priceController, 'Preço'),
+                  CustomTextField(controller: _priceController, label: 'Preço'),
                   const SizedBox(height: 16),
-                  _buildTextField(_descriptionController, 'Descrição',
+                  CustomTextField(
+                      controller: _descriptionController,
+                      label: 'Descrição',
                       maxLines: 3),
                   const SizedBox(height: 16),
                   _buildImagePicker(),
@@ -382,79 +368,6 @@ class _AddCarScreenState extends State<AddCarScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildDropdownField(String label, String? selectedValue,
-      List<String> options, ValueChanged<String?> onChanged) {
-    return DropdownButtonFormField<String>(
-      value: selectedValue,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(
-          fontSize: 14,
-          color: Colors.grey,
-          fontWeight: FontWeight.w400,
-        ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 12),
-        enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey),
-        ),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.blueGrey, width: 2),
-        ),
-      ),
-      style: const TextStyle(
-        fontSize: 16,
-        color: Colors.black87,
-        fontWeight: FontWeight.w500,
-      ),
-      icon: const Icon(
-        Icons.arrow_drop_down,
-        color: Colors.blueGrey,
-      ),
-      items: options.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      onChanged: onChanged,
-      dropdownColor: Colors.white,
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label,
-      {int maxLines = 1}) {
-    return TextFormField(
-      controller: controller,
-      maxLines: maxLines,
-      style: const TextStyle(
-        fontSize: 16,
-        color: Colors.black87,
-        fontWeight: FontWeight.w500,
-      ),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(
-          fontSize: 14,
-          color: Colors.grey,
-          fontWeight: FontWeight.w400,
-        ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 12),
-        enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey),
-        ),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.blueGrey, width: 2),
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Por favor, insira o $label';
-        }
-        return null;
-      },
     );
   }
 }
