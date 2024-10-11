@@ -6,9 +6,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:roadcarsapp/components/color_selection/color_selection.dart';
 import 'package:roadcarsapp/components/utils/dropdown_field.dart';
 import 'package:roadcarsapp/components/utils/text_field.dart';
-import 'package:roadcarsapp/components/image_picker/image_picker.dart'; // Importação do componente de seleção de imagens
+import 'package:roadcarsapp/components/image_picker/image_picker.dart';
+import 'package:roadcarsapp/components/utils/generic.dart'; // Importação dos componentes genéricos
 import 'dart:typed_data';
-import 'package:firebase_auth/firebase_auth.dart'; // Adicionado para autenticação
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart'; // Importação necessária para FilteringTextInputFormatter
+import 'package:intl/intl.dart'; // Importação do pacote intl
 
 class EditCarScreen extends StatefulWidget {
   final String carId;
@@ -22,11 +25,10 @@ class EditCarScreen extends StatefulWidget {
 class _EditCarScreenState extends State<EditCarScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance; // Autenticação
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final _formKey = GlobalKey<FormState>();
 
-  // Controladores de texto
   final TextEditingController _kmController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -105,6 +107,18 @@ class _EditCarScreenState extends State<EditCarScreen> {
     }
   }
 
+  void _removeImageUrl(int index) {
+    setState(() {
+      _carImageUrls.removeAt(index);
+    });
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _carImages.removeAt(index);
+    });
+  }
+
   Future<List<String>> _uploadCarImagesToStorage(String carId) async {
     List<String> downloadUrls = [];
     for (int i = 0; i < _carImages.length; i++) {
@@ -140,8 +154,11 @@ class _EditCarScreenState extends State<EditCarScreen> {
             _firestore.collection('cars').doc(widget.carId);
 
         if (_carImages.isNotEmpty) {
-          _carImageUrls.addAll(await _uploadCarImagesToStorage(carDoc.id));
+          _carImageUrls = await _uploadCarImagesToStorage(carDoc.id);
         }
+
+        final NumberFormat kmFormat = NumberFormat.decimalPattern('pt_BR');
+        final int km = int.parse(_kmController.text.replaceAll('.', ''));
 
         await carDoc.update({
           'brand': _selectedBrand,
@@ -150,36 +167,26 @@ class _EditCarScreenState extends State<EditCarScreen> {
           'fuel': _selectedFuel,
           'transmission': _selectedTransmission,
           'color': _selectedColor,
-          'km': _kmController.text,
+          'km': km,
           'year': _yearController.text,
           'armored': _isArmored,
-          'price': _priceController.text,
+          'price': double.parse(
+              _priceController.text.replaceAll('.', '').replaceAll(',', '.')),
           'description': _descriptionController.text,
-          'imageUrls': _carImageUrls,
+          if (_carImageUrls.isNotEmpty) 'imageUrls': _carImageUrls,
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Carro atualizado com sucesso!')),
         );
-        Navigator.pop(context);
+        Navigator.pop(context,
+            true); // Retorna true para indicar que o carro foi atualizado
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao editar carro: $e')),
         );
       }
     }
-  }
-
-  void _removeImageUrl(int index) {
-    setState(() {
-      _carImageUrls.removeAt(index);
-    });
-  }
-
-  void _removeImage(int index) {
-    setState(() {
-      _carImages.removeAt(index);
-    });
   }
 
   @override
@@ -275,10 +282,9 @@ class _EditCarScreenState extends State<EditCarScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  CustomTextField(
-                    controller: _kmController,
-                    label: 'KM Rodados',
-                  ),
+                  KmInputField(
+                      label: 'Quilometragem',
+                      controller: _kmController), // Usando KmInputField
                   const SizedBox(height: 16),
                   SwitchListTile(
                     title: const Text(
@@ -294,10 +300,9 @@ class _EditCarScreenState extends State<EditCarScreen> {
                     activeColor: Colors.blueGrey,
                   ),
                   const SizedBox(height: 16),
-                  CustomTextField(
-                    controller: _priceController,
-                    label: 'Preço',
-                  ),
+                  PriceInputField(
+                      label: 'Preço',
+                      controller: _priceController), // Usando PriceInputField
                   const SizedBox(height: 16),
                   CustomTextField(
                     controller: _descriptionController,

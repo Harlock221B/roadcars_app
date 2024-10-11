@@ -2,15 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:roadcarsapp/components/utils/generic.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 import 'package:roadcarsapp/view/screens/cars/edit_car_screen.dart';
 import 'package:roadcarsapp/components/favoriteicon/favorite.dart';
 
-class VehicleDetailsPage extends StatelessWidget {
+class VehicleDetailsPage extends StatefulWidget {
   final String carId; // O ID do carro no Firestore
+  const VehicleDetailsPage({required this.carId, Key? key}) : super(key: key);
 
-  const VehicleDetailsPage({required this.carId, super.key});
+  @override
+  _VehicleDetailsPageState createState() => _VehicleDetailsPageState();
+}
 
+class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +33,7 @@ class VehicleDetailsPage extends StatelessWidget {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black87),
         actions: [
-          FavoriteIcon(carId: carId), // Ícone de Favoritar no AppBar
+          FavoriteIcon(carId: widget.carId), // Ícone de Favoritar no AppBar
           // Botão de edição condicional
           FutureBuilder<User?>(
             future: FirebaseAuth.instance.userChanges().first,
@@ -36,8 +42,7 @@ class VehicleDetailsPage extends StatelessWidget {
                 return const CircularProgressIndicator();
               }
               if (!snapshot.hasData) {
-                return const SizedBox
-                    .shrink(); // Se não houver usuário logado, não exibe nada
+                return const SizedBox.shrink();
               }
 
               final currentUserId = snapshot.data!.uid;
@@ -46,7 +51,7 @@ class VehicleDetailsPage extends StatelessWidget {
               return FutureBuilder<DocumentSnapshot>(
                 future: FirebaseFirestore.instance
                     .collection('cars')
-                    .doc(carId)
+                    .doc(widget.carId)
                     .get(),
                 builder: (context, carSnapshot) {
                   if (carSnapshot.connectionState == ConnectionState.waiting) {
@@ -58,25 +63,27 @@ class VehicleDetailsPage extends StatelessWidget {
 
                   var vehicle =
                       carSnapshot.data!.data() as Map<String, dynamic>;
-                  final vehicleOwnerId = vehicle[
-                      'userId']; // ID do usuário que adicionou o veículo
+                  final vehicleOwnerId = vehicle['userId'];
 
                   return vehicleOwnerId == currentUserId
                       ? IconButton(
                           icon: const Icon(Icons.edit, color: Colors.black87),
-                          onPressed: () {
-                            Navigator.push(
+                          onPressed: () async {
+                            final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => EditCarScreen(
-                                  carId: carId,
+                                  carId: widget.carId,
                                 ),
                               ),
                             );
+
+                            if (result == true) {
+                              setState(() {}); // Força o rebuild da página
+                            }
                           },
                         )
-                      : const SizedBox
-                          .shrink(); // Se não for o proprietário, não exibe o botão
+                      : const SizedBox.shrink();
                 },
               );
             },
@@ -84,7 +91,10 @@ class VehicleDetailsPage extends StatelessWidget {
         ],
       ),
       body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance.collection('cars').doc(carId).get(),
+        future: FirebaseFirestore.instance
+            .collection('cars')
+            .doc(widget.carId)
+            .get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -96,7 +106,13 @@ class VehicleDetailsPage extends StatelessWidget {
           var vehicle = snapshot.data!.data() as Map<String, dynamic>;
           List<String> imageUrls = List<String>.from(vehicle['imageUrls']);
           final String vehicleName = vehicle['model'] ?? 'Veículo Indefinido';
-          final String userId = vehicle['userId'];
+          final double price =
+              vehicle['price'] != null ? vehicle['price'].toDouble() : 0.0;
+          final int km = vehicle['km'] != null ? vehicle['km'] as int : 0;
+
+          final NumberFormat kmFormat = NumberFormat.decimalPattern('pt_BR');
+          final NumberFormat currencyFormat =
+              NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
 
           return Stack(
             children: [
@@ -108,7 +124,7 @@ class VehicleDetailsPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildImageCarousel(imageUrls), // Carrossel das imagens
+                        _buildImageCarousel(imageUrls),
                         const SizedBox(height: 20),
                         Text(
                           vehicleName,
@@ -123,7 +139,7 @@ class VehicleDetailsPage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'R\$ ${vehicle['price'] ?? 'Preço Indefinido'}',
+                              currencyFormat.format(price),
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -146,10 +162,10 @@ class VehicleDetailsPage extends StatelessWidget {
                         const SizedBox(height: 20),
                         _buildDetailsCard(context, vehicle),
                         const SizedBox(height: 20),
-                        _buildFeatureRow(vehicle),
+                        _buildFeatureRow(vehicle, kmFormat),
                         const SizedBox(height: 20),
                         _buildExtraInfo(vehicle),
-                        const SizedBox(height: 100), // Espaço para o botão fixo
+                        const SizedBox(height: 100),
                       ],
                     ),
                   ),
@@ -208,7 +224,7 @@ class VehicleDetailsPage extends StatelessWidget {
         );
       },
       options: CarouselOptions(
-        height: 400,
+        height: 350,
         enlargeCenterPage: true,
         viewportFraction: 0.8,
         autoPlay: true,
@@ -254,11 +270,12 @@ class VehicleDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildFeatureRow(Map<String, dynamic> vehicle) {
+  Widget _buildFeatureRow(Map<String, dynamic> vehicle, NumberFormat kmFormat) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildDetailIcon(Icons.speed, 'Quilometragem: ${vehicle['km']} km'),
+        _buildDetailIcon(
+            Icons.speed, 'Quilometragem: ${kmFormat.format(vehicle['km'])} km'),
         _buildDetailIcon(Icons.color_lens, 'Cor: ${vehicle['color']}'),
         _buildDetailIcon(
             Icons.local_gas_station, 'Combustível: ${vehicle['fuel']}'),

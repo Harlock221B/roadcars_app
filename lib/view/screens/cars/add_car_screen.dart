@@ -6,10 +6,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:roadcarsapp/components/image_picker/image_picker.dart';
 import 'package:roadcarsapp/components/color_selection/color_selection.dart';
 import 'package:roadcarsapp/components/utils/dropdown_field.dart';
-import 'package:roadcarsapp/components/utils/text_field.dart';
+import 'package:roadcarsapp/components/utils/text_field.dart'; // Importação do componente de preço
+import 'package:roadcarsapp/components/utils/generic.dart'; // Importação do novo componente de km
 import 'dart:typed_data';
 import 'package:firebase_auth/firebase_auth.dart'; // Adicionado para autenticação
-import 'package:dotted_border/dotted_border.dart'; // Adicionado para borda pontilhada
+import 'package:intl/intl.dart'; // Importação do pacote intl
 
 class AddCarScreen extends StatefulWidget {
   const AddCarScreen({super.key});
@@ -42,6 +43,8 @@ class _AddCarScreenState extends State<AddCarScreen> {
   String _selectedTransmission = 'Automático'; // Valor inicial para câmbio
   String _selectedColor = 'Preto'; // Valor inicial para cor
   bool _isArmored = false; // Valor inicial para blindagem
+
+  bool _isLoading = false; // Indicador de carregamento
 
   Future<void> _pickImages() async {
     try {
@@ -107,7 +110,15 @@ class _AddCarScreenState extends State<AddCarScreen> {
     }
 
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true; // Inicia o carregamento
+      });
+
       try {
+        // Formatação dos quilômetros
+        final NumberFormat kmFormat = NumberFormat.decimalPattern('pt_BR');
+        final int km = int.parse(_kmController.text.replaceAll('.', ''));
+
         // Adiciona o carro à coleção "cars"
         DocumentReference carDoc = await _firestore.collection('cars').add({
           'brand': _selectedBrand,
@@ -116,10 +127,12 @@ class _AddCarScreenState extends State<AddCarScreen> {
           'fuel': _selectedFuel,
           'transmission': _selectedTransmission,
           'color': _selectedColor,
-          'km': _kmController.text,
+          'km': km, // Armazena os quilômetros como inteiro
           'year': _yearController.text,
           'armored': _isArmored,
-          'price': _priceController.text,
+          'price': double.parse(_priceController.text
+              .replaceAll('.', '')
+              .replaceAll(',', '.')), // Converte o preço para double
           'description': _descriptionController.text,
           'createdAt': FieldValue.serverTimestamp(),
           'userId': _auth.currentUser!.uid,
@@ -135,14 +148,6 @@ class _AddCarScreenState extends State<AddCarScreen> {
           });
         }
 
-        // Atualiza o documento do usuário, adicionando o carId na lista de carros registrados
-        await _firestore
-            .collection('users')
-            .doc(_auth.currentUser!.uid)
-            .update({
-          'registeredCars': FieldValue.arrayUnion([carDoc.id]),
-        });
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Carro adicionado com sucesso!')),
         );
@@ -151,6 +156,10 @@ class _AddCarScreenState extends State<AddCarScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao adicionar carro: $e')),
         );
+      } finally {
+        setState(() {
+          _isLoading = false; // Finaliza o carregamento
+        });
       }
     }
   }
@@ -168,118 +177,142 @@ class _AddCarScreenState extends State<AddCarScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _addCar,
         backgroundColor: Colors.blueGrey,
-        child: const Icon(Icons.save),
+        child: _isLoading
+            ? const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              )
+            : const Icon(Icons.save),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 2,
-          child: Padding(
+      body: Stack(
+        children: [
+          Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                children: [
-                  DropdownField(
-                    label: 'Marca',
-                    selectedValue: _selectedBrand,
-                    options: brands,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedBrand = value!;
-                      });
-                    },
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
+                    children: [
+                      DropdownField(
+                        label: 'Marca',
+                        selectedValue: _selectedBrand,
+                        options: brands,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedBrand = value!;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextField(
+                        controller: _modelController,
+                        label: 'Modelo',
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownField(
+                        label: 'Motor',
+                        selectedValue: _selectedMotor,
+                        options: motors,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedMotor = value!;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownField(
+                        label: 'Combustível',
+                        selectedValue: _selectedFuel,
+                        options: fuelTypes,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedFuel = value!;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownField(
+                        label: 'Câmbio',
+                        selectedValue: _selectedTransmission,
+                        options: transmissions,
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedTransmission = value!;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextField(
+                          controller: _yearController, label: 'Ano'),
+                      const SizedBox(height: 16),
+                      ColorSelection(
+                        selectedColor: _selectedColor,
+                        colors: carColors,
+                        onColorSelected: (color) {
+                          setState(() {
+                            _selectedColor = color;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      KmInputField(
+                        controller: _kmController,
+                        label: 'KM Rodados',
+                      ),
+                      const SizedBox(height: 16),
+                      SwitchListTile(
+                        title: const Text(
+                          'Blindado',
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        ),
+                        value: _isArmored,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _isArmored = value;
+                          });
+                        },
+                        activeColor: Colors.blueGrey,
+                      ),
+                      const SizedBox(height: 16),
+                      PriceInputField(
+                        controller: _priceController,
+                        label: 'Preço',
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextField(
+                        controller: _descriptionController,
+                        label: 'Descrição',
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 16),
+                      ImagePickerComponent(
+                        carImages: _carImages,
+                        carImageUrls: _carImageUrls, // URLs das imagens salvas
+                        onPickImages: _pickImages,
+                        onRemoveImage: _removeImage,
+                        onRemoveImageUrl:
+                            _removeImageUrl, // Remover URLs de imagens salvas
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  CustomTextField(
-                    controller: _modelController,
-                    label: 'Modelo',
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownField(
-                    label: 'Motor',
-                    selectedValue: _selectedMotor,
-                    options: motors,
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedMotor = value!;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownField(
-                      label: 'Combustível',
-                      selectedValue: _selectedFuel,
-                      options: fuelTypes,
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedFuel = value!;
-                        });
-                      }),
-                  const SizedBox(height: 16),
-                  DropdownField(
-                      label: 'Câmbio',
-                      selectedValue: _selectedTransmission,
-                      options: transmissions,
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedTransmission = value!;
-                        });
-                      }),
-                  const SizedBox(height: 16),
-                  CustomTextField(controller: _yearController, label: 'Ano'),
-                  const SizedBox(height: 16),
-                  ColorSelection(
-                    selectedColor: _selectedColor,
-                    colors: carColors,
-                    onColorSelected: (color) {
-                      setState(() {
-                        _selectedColor = color;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  CustomTextField(
-                      controller: _kmController, label: 'KM Rodados'),
-                  const SizedBox(height: 16),
-                  SwitchListTile(
-                    title: const Text(
-                      'Blindado',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    value: _isArmored,
-                    onChanged: (bool value) {
-                      setState(() {
-                        _isArmored = value;
-                      });
-                    },
-                    activeColor: Colors.blueGrey,
-                  ),
-                  const SizedBox(height: 16),
-                  CustomTextField(controller: _priceController, label: 'Preço'),
-                  const SizedBox(height: 16),
-                  CustomTextField(
-                      controller: _descriptionController,
-                      label: 'Descrição',
-                      maxLines: 3),
-                  const SizedBox(height: 16),
-                  ImagePickerComponent(
-                    carImages: _carImages,
-                    carImageUrls: _carImageUrls, // URLs das imagens salvas
-                    onPickImages: _pickImages,
-                    onRemoveImage: _removeImage,
-                    onRemoveImageUrl:
-                        _removeImageUrl, // Remover URLs de imagens salvas
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
+          if (_isLoading)
+            Container(
+              color: Colors.white.withOpacity(0.5),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+        ],
       ),
     );
   }

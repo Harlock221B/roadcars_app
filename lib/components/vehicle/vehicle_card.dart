@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:roadcarsapp/view/screens/cars/car_detail_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:roadcarsapp/components/favoriteicon/favorite.dart';
+import 'package:intl/intl.dart'; // Importação do pacote intl
 
 class VehicleCard extends StatelessWidget {
   final Map<String, dynamic> vehicle;
@@ -12,6 +13,13 @@ class VehicleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String imageUrl = vehicle['imageUrls'][0];
+    final NumberFormat currencyFormat =
+        NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+
+    final NumberFormat kmFormat = NumberFormat.decimalPattern('pt_BR');
+
+    // Garantir que o valor de km seja um número
+    final int km = vehicle['km'] != null ? vehicle['km'] as int : 0;
 
     return GestureDetector(
       onTap: () {
@@ -98,21 +106,13 @@ class VehicleCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    vehicle['description'] ?? "Sem descrição",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[700], // Ajustar a cor
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "R\$ ${vehicle['price']}", // Formatação de preço
+                        currencyFormat.format(vehicle['price'] ??
+                            0), // Preço formatado com valor padrão
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -120,7 +120,7 @@ class VehicleCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        "Ano: ${vehicle['year']}",
+                        "Ano: ${vehicle['year'] ?? 'Ano Indefinido'}",
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[700], // Ajustar a cor
@@ -148,6 +148,20 @@ class VehicleCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         vehicle['transmission'] ?? "Manual",
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.speed,
+                          size: 16,
+                          color: Colors.grey[600]), // Ícone de quilometragem
+                      const SizedBox(width: 4),
+                      Text(
+                        "${kmFormat.format(km)} km", // Quilometragem formatada
                         style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                     ],
