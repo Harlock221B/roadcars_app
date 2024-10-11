@@ -8,6 +8,7 @@ class EmailVerificationScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Verificação de E-mail'),
+        backgroundColor: Colors.blueGrey,
       ),
       body: Center(
         child: Padding(
@@ -15,18 +16,44 @@ class EmailVerificationScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              Image.asset(
+                'assets/email_verification.png', // Certifique-se de que a imagem está na pasta assets
+                height: 150,
+              ),
+              const SizedBox(height: 30),
+              const Text(
+                'Verifique seu E-mail',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueGrey,
+                ),
+              ),
+              const SizedBox(height: 20),
               const Text(
                 'Um e-mail de verificação foi enviado para o seu endereço de e-mail. Por favor, verifique sua caixa de entrada e confirme seu e-mail para continuar.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: 16, color: Colors.black54),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
                   // Opcional: Redirecionar para a tela de login
                   Navigator.pop(context);
                 },
-                child: const Text('Voltar ao Login'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueGrey,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Voltar ao Login',
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             ],
           ),

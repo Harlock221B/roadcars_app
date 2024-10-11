@@ -3,12 +3,15 @@ import 'package:roadcarsapp/data/utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:dotted_border/dotted_border.dart';
+import 'package:roadcarsapp/components/color_selection/color_selection.dart';
+import 'package:roadcarsapp/components/utils/dropdown_field.dart';
+import 'package:roadcarsapp/components/utils/text_field.dart';
+import 'package:roadcarsapp/components/image_picker/image_picker.dart'; // Importação do componente de seleção de imagens
 import 'dart:typed_data';
-import 'package:firebase_auth/firebase_auth.dart'; // Autenticação
+import 'package:firebase_auth/firebase_auth.dart'; // Adicionado para autenticação
 
 class EditCarScreen extends StatefulWidget {
-  final String carId; // ID do carro que será editado
+  final String carId;
 
   const EditCarScreen({required this.carId, super.key});
 
@@ -19,7 +22,7 @@ class EditCarScreen extends StatefulWidget {
 class _EditCarScreenState extends State<EditCarScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance; // Autenticação
 
   final _formKey = GlobalKey<FormState>();
 
@@ -33,7 +36,6 @@ class _EditCarScreenState extends State<EditCarScreen> {
   List<Uint8List> _carImages = [];
   List<String> _carImageUrls = [];
 
-  // Valores para selects
   String _selectedBrand = 'Toyota';
   String _selectedMotor = '1.0';
   String _selectedFuel = 'Gasolina';
@@ -49,11 +51,9 @@ class _EditCarScreenState extends State<EditCarScreen> {
 
   Future<void> _loadCarDetails() async {
     try {
-      // Buscando os dados do carro usando o ID fornecido
       DocumentSnapshot carSnapshot =
           await _firestore.collection('cars').doc(widget.carId).get();
 
-      // Verifique se o documento existe antes de tentar acessar os dados
       if (!carSnapshot.exists) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Carro não encontrado.')),
@@ -63,22 +63,16 @@ class _EditCarScreenState extends State<EditCarScreen> {
 
       Map<String, dynamic> carData = carSnapshot.data() as Map<String, dynamic>;
 
-      // Atualizando o estado com os dados do carro
       setState(() {
-        _selectedBrand =
-            carData['brand'] ?? 'Toyota'; // Valor padrão se não existir
+        _selectedBrand = carData['brand'] ?? 'Toyota';
         _modelController.text = carData['model'] ?? '';
-        _selectedMotor =
-            carData['motor'] ?? '1.0'; // Valor padrão se não existir
-        _selectedFuel =
-            carData['fuel'] ?? 'Gasolina'; // Valor padrão se não existir
-        _selectedTransmission = carData['transmission'] ??
-            'Automático'; // Valor padrão se não existir
-        _selectedColor =
-            carData['color'] ?? 'Preto'; // Valor padrão se não existir
+        _selectedMotor = carData['motor'] ?? '1.0';
+        _selectedFuel = carData['fuel'] ?? 'Gasolina';
+        _selectedTransmission = carData['transmission'] ?? 'Automático';
+        _selectedColor = carData['color'] ?? 'Preto';
         _kmController.text = carData['km']?.toString() ?? '';
         _yearController.text = carData['year']?.toString() ?? '';
-        _isArmored = carData['armored'] ?? false; // Valor padrão se não existir
+        _isArmored = carData['armored'] ?? false;
         _priceController.text = carData['price']?.toString() ?? '';
         _descriptionController.text = carData['description'] ?? '';
         _carImageUrls = List<String>.from(carData['imageUrls'] ?? []);
@@ -142,13 +136,11 @@ class _EditCarScreenState extends State<EditCarScreen> {
 
     if (_formKey.currentState!.validate()) {
       try {
-        // Atualiza os dados do carro no Firestore
         DocumentReference carDoc =
             _firestore.collection('cars').doc(widget.carId);
 
-        // Upload das imagens para o Storage
         if (_carImages.isNotEmpty) {
-          _carImageUrls = await _uploadCarImagesToStorage(carDoc.id);
+          _carImageUrls.addAll(await _uploadCarImagesToStorage(carDoc.id));
         }
 
         await carDoc.update({
@@ -163,7 +155,7 @@ class _EditCarScreenState extends State<EditCarScreen> {
           'armored': _isArmored,
           'price': _priceController.text,
           'description': _descriptionController.text,
-          if (_carImageUrls.isNotEmpty) 'imageUrls': _carImageUrls,
+          'imageUrls': _carImageUrls,
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -176,6 +168,18 @@ class _EditCarScreenState extends State<EditCarScreen> {
         );
       }
     }
+  }
+
+  void _removeImageUrl(int index) {
+    setState(() {
+      _carImageUrls.removeAt(index);
+    });
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _carImages.removeAt(index);
+    });
   }
 
   @override
@@ -207,39 +211,74 @@ class _EditCarScreenState extends State<EditCarScreen> {
               child: ListView(
                 physics: const BouncingScrollPhysics(),
                 children: [
-                  _buildDropdownField('Marca', _selectedBrand, brands, (value) {
-                    setState(() {
-                      _selectedBrand = value!;
-                    });
-                  }),
+                  DropdownField(
+                    label: 'Marca',
+                    selectedValue: _selectedBrand,
+                    options: brands,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedBrand = value!;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 16),
-                  _buildTextField(_modelController, 'Modelo'),
+                  CustomTextField(
+                    controller: _modelController,
+                    label: 'Modelo',
+                  ),
                   const SizedBox(height: 16),
-                  _buildDropdownField('Motor', _selectedMotor, motors, (value) {
-                    setState(() {
-                      _selectedMotor = value!;
-                    });
-                  }),
+                  DropdownField(
+                    label: 'Motor',
+                    selectedValue: _selectedMotor,
+                    options: motors,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedMotor = value!;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 16),
-                  _buildDropdownField('Combustível', _selectedFuel, fuelTypes,
-                      (value) {
-                    setState(() {
-                      _selectedFuel = value!;
-                    });
-                  }),
+                  DropdownField(
+                    label: 'Combustível',
+                    selectedValue: _selectedFuel,
+                    options: fuelTypes,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedFuel = value!;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 16),
-                  _buildDropdownField(
-                      'Câmbio', _selectedTransmission, transmissions, (value) {
-                    setState(() {
-                      _selectedTransmission = value!;
-                    });
-                  }),
+                  DropdownField(
+                    label: 'Câmbio',
+                    selectedValue: _selectedTransmission,
+                    options: transmissions,
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedTransmission = value!;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 16),
-                  _buildTextField(_yearController, 'Ano'),
+                  CustomTextField(
+                    controller: _yearController,
+                    label: 'Ano',
+                  ),
                   const SizedBox(height: 16),
-                  _buildColorSelection(),
+                  ColorSelection(
+                    colors: carColors,
+                    selectedColor: _selectedColor,
+                    onColorSelected: (color) {
+                      setState(() {
+                        _selectedColor = color;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 16),
-                  _buildTextField(_kmController, 'KM Rodados'),
+                  CustomTextField(
+                    controller: _kmController,
+                    label: 'KM Rodados',
+                  ),
                   const SizedBox(height: 16),
                   SwitchListTile(
                     title: const Text(
@@ -255,239 +294,31 @@ class _EditCarScreenState extends State<EditCarScreen> {
                     activeColor: Colors.blueGrey,
                   ),
                   const SizedBox(height: 16),
-                  _buildTextField(_priceController, 'Preço'),
+                  CustomTextField(
+                    controller: _priceController,
+                    label: 'Preço',
+                  ),
                   const SizedBox(height: 16),
-                  _buildTextField(_descriptionController, 'Descrição',
-                      maxLines: 3),
+                  CustomTextField(
+                    controller: _descriptionController,
+                    label: 'Descrição',
+                    maxLines: 3,
+                  ),
                   const SizedBox(height: 16),
-                  _buildImagePicker(),
+                  ImagePickerComponent(
+                    carImages: _carImages,
+                    carImageUrls: _carImageUrls, // URLs das imagens salvas
+                    onPickImages: _pickImages,
+                    onRemoveImage: _removeImage,
+                    onRemoveImageUrl:
+                        _removeImageUrl, // Remover URLs de imagens salvas
+                  ),
                 ],
               ),
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildDropdownField(String label, String? selectedValue,
-      List<String> options, ValueChanged<String?> onChanged) {
-    return DropdownButtonFormField<String>(
-      value: selectedValue,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(
-          fontSize: 14,
-          color: Colors.grey,
-          fontWeight: FontWeight.w400,
-        ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 12),
-        enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey),
-        ),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.blueGrey, width: 2),
-        ),
-      ),
-      style: const TextStyle(
-        fontSize: 16,
-        color: Colors.black87,
-        fontWeight: FontWeight.w500,
-      ),
-      icon: const Icon(
-        Icons.arrow_drop_down,
-        color: Colors.blueGrey,
-      ),
-      items: options.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
-      onChanged: onChanged,
-      dropdownColor: Colors.white,
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label,
-      {int maxLines = 1}) {
-    return TextFormField(
-      controller: controller,
-      maxLines: maxLines,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(
-          fontSize: 14,
-          color: Colors.grey,
-          fontWeight: FontWeight.w400,
-        ),
-        enabledBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey),
-        ),
-        focusedBorder: const UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.blueGrey),
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Por favor, insira $label';
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget _buildColorSelection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Cor',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 12, // Espaçamento horizontal entre os círculos
-          runSpacing: 12, // Espaçamento vertical entre os círculos
-          children: carColors.entries.map((entry) {
-            return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedColor = entry.key;
-                });
-              },
-              child: Tooltip(
-                message: entry.key, // Mostra o nome da cor ao passar o dedo
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
-                  padding: const EdgeInsets.all(3), // Espaço para a borda
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: _selectedColor == entry.key
-                          ? Colors.blueAccent
-                          : Colors.grey.shade300,
-                      width: 2.0,
-                    ),
-                  ),
-                  child: CircleAvatar(
-                    backgroundColor: entry.value,
-                    radius: 22, // Tamanho dos círculos
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-
-  void _removeImage(int index) {
-    setState(() {
-      _carImages.removeAt(index);
-    });
-  }
-
-  Widget _buildImagePicker() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center, // Centraliza o conteúdo
-      children: [
-        const Text(
-          'Imagens do Carro',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87, // Cor de texto mais elegante
-          ),
-          textAlign: TextAlign.center, // Centraliza o texto
-        ),
-        const SizedBox(height: 16), // Mais espaço entre o título e o grid
-        GridView.builder(
-          shrinkWrap: true,
-          itemCount: (_carImages.length + 1) > 6
-              ? _carImages.length
-              : _carImages.length + 1,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 16, // Mais espaço entre os quadrados
-            mainAxisSpacing: 16, // Mais espaço entre os quadrados
-          ),
-          itemBuilder: (context, index) {
-            if (index < _carImages.length) {
-              return Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius:
-                        BorderRadius.circular(12), // Bordas suavizadas
-                    child: Image.memory(
-                      _carImages[index],
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                    ),
-                  ),
-                  Positioned(
-                    top: 6, // Ajuste fino na posição do ícone de remover
-                    right: 6,
-                    child: GestureDetector(
-                      onTap: () => _removeImage(index),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.black54,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            } else if (index == _carImages.length && _carImages.length < 6) {
-              // Placeholder visual para adicionar mais imagens
-              return GestureDetector(
-                onTap: _pickImages,
-                child: DottedBorder(
-                  borderType: BorderType.RRect,
-                  radius: const Radius.circular(12),
-                  dashPattern: const [6, 3],
-                  color: Colors.grey[400]!,
-                  child: const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.add_a_photo,
-                          color: Colors.grey,
-                          size: 32,
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Adicionar mais fotos',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center, // Centraliza o texto
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            } else {
-              return const SizedBox
-                  .shrink(); // Se o número de imagens for superior a 6
-            }
-          },
-        ),
-      ],
     );
   }
 }

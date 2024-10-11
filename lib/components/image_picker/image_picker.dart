@@ -1,63 +1,68 @@
 import 'package:flutter/material.dart';
-import 'dart:typed_data';
 import 'package:dotted_border/dotted_border.dart';
+import 'dart:typed_data';
 
-class ImagePickerWidget extends StatelessWidget {
+class ImagePickerComponent extends StatelessWidget {
   final List<Uint8List> carImages;
-  final Function(int) onRemoveImage;
-  final Function() onPickImages;
+  final List<String> carImageUrls; // Para imagens existentes
+  final VoidCallback onPickImages;
+  final ValueChanged<int> onRemoveImage;
+  final ValueChanged<int>
+      onRemoveImageUrl; // Para remover URLs de imagens salvas
 
-  const ImagePickerWidget({
-    required this.carImages,
-    required this.onRemoveImage,
-    required this.onPickImages,
+  const ImagePickerComponent({
     Key? key,
+    required this.carImages,
+    required this.carImageUrls,
+    required this.onPickImages,
+    required this.onRemoveImage,
+    required this.onRemoveImageUrl,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center, // Centraliza o conteúdo
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const Text(
           'Imagens do Carro',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.black87, // Cor de texto mais elegante
+            color: Colors.black87,
           ),
-          textAlign: TextAlign.center, // Centraliza o texto
+          textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 16), // Mais espaço entre o título e o grid
+        const SizedBox(height: 16),
         GridView.builder(
           shrinkWrap: true,
-          itemCount: (carImages.length + 1) > 6
-              ? carImages.length
-              : carImages.length + 1,
+          itemCount: (carImages.length + carImageUrls.length + 1) > 6
+              ? carImages.length + carImageUrls.length
+              : carImages.length + carImageUrls.length + 1,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
-            crossAxisSpacing: 16, // Mais espaço entre os quadrados
-            mainAxisSpacing: 16, // Mais espaço entre os quadrados
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
           ),
           itemBuilder: (context, index) {
-            if (index < carImages.length) {
+            if (index < carImageUrls.length) {
+              // Exibindo imagens já salvas
               return Stack(
                 children: [
                   ClipRRect(
-                    borderRadius:
-                        BorderRadius.circular(12), // Bordas suavizadas
-                    child: Image.memory(
-                      carImages[index],
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      carImageUrls[index],
                       fit: BoxFit.cover,
                       width: double.infinity,
                       height: double.infinity,
                     ),
                   ),
                   Positioned(
-                    top: 6, // Ajuste fino na posição do ícone de remover
+                    top: 6,
                     right: 6,
                     child: GestureDetector(
-                      onTap: () => onRemoveImage(index),
+                      onTap: () => onRemoveImageUrl(index),
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: const BoxDecoration(
@@ -74,8 +79,43 @@ class ImagePickerWidget extends StatelessWidget {
                   ),
                 ],
               );
-            } else if (index == carImages.length && carImages.length < 6) {
-              // Placeholder visual para adicionar mais imagens
+            } else if (index < carImageUrls.length + carImages.length) {
+              // Exibindo novas imagens carregadas
+              final localImageIndex = index - carImageUrls.length;
+              return Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.memory(
+                      carImages[localImageIndex],
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
+                  ),
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: GestureDetector(
+                      onTap: () => onRemoveImage(localImageIndex),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.black54,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            } else if (index == carImageUrls.length + carImages.length &&
+                carImages.length + carImageUrls.length < 6) {
               return GestureDetector(
                 onTap: onPickImages,
                 child: DottedBorder(
@@ -99,7 +139,7 @@ class ImagePickerWidget extends StatelessWidget {
                             color: Colors.grey,
                             fontSize: 14,
                           ),
-                          textAlign: TextAlign.center, // Centraliza o texto
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
@@ -107,8 +147,7 @@ class ImagePickerWidget extends StatelessWidget {
                 ),
               );
             } else {
-              return const SizedBox
-                  .shrink(); // Se o número de imagens for superior a 6
+              return const SizedBox.shrink();
             }
           },
         ),

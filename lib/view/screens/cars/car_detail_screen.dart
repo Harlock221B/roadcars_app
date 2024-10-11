@@ -96,8 +96,7 @@ class VehicleDetailsPage extends StatelessWidget {
           var vehicle = snapshot.data!.data() as Map<String, dynamic>;
           List<String> imageUrls = List<String>.from(vehicle['imageUrls']);
           final String vehicleName = vehicle['model'] ?? 'Veículo Indefinido';
-          final String whatsappUrl =
-              "https://wa.me/19982032604?text=Olá!%20Estou%20interessado%20no%20$vehicleName.";
+          final String userId = vehicle['userId'];
 
           return Stack(
             children: [
@@ -156,7 +155,8 @@ class VehicleDetailsPage extends StatelessWidget {
                   ),
                 ),
               ),
-              _buildBuyButton(context, whatsappUrl),
+              _buildBuyButton(
+                  context, () => openWhatsAppWithSeller(context, vehicle)),
             ],
           );
         },
@@ -306,7 +306,7 @@ class VehicleDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBuyButton(BuildContext context, String whatsappUrl) {
+  Widget _buildBuyButton(BuildContext context, VoidCallback onPressed) {
     return Positioned(
       bottom: 0,
       left: 0,
@@ -314,7 +314,7 @@ class VehicleDetailsPage extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         child: ElevatedButton(
-          onPressed: () => _launchWhatsApp(context, whatsappUrl),
+          onPressed: onPressed,
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
             backgroundColor: Colors.blueGrey,
@@ -336,7 +336,43 @@ class VehicleDetailsPage extends StatelessWidget {
   void _launchWhatsApp(BuildContext context, String url) async {
     if (!await launchUrl(Uri.parse(url))) {
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Erro ao abrir WhatsApp')));
+        const SnackBar(content: Text('Erro ao abrir WhatsApp')),
+      );
+    }
+  }
+
+  Future<void> openWhatsAppWithSeller(
+      BuildContext context, Map<String, dynamic> vehicle) async {
+    final String vehicleName = vehicle['model'] ?? 'Veículo Indefinido';
+    final String userId = vehicle['userId'];
+
+    try {
+      // Buscando o documento do vendedor no Firestore
+      final DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
+
+      // Verificando se o snapshot contém dados
+      if (userSnapshot.exists) {
+        final String phoneNumber =
+            userSnapshot['phone'] ?? 'Número não disponível';
+
+        // Montando a URL do WhatsApp
+        final String whatsappUrl =
+            "https://wa.me/$phoneNumber?text=Olá!%20Estou%20interessado%20no%20$vehicleName.";
+
+        // Chamando a função para abrir o WhatsApp
+        _launchWhatsApp(context, whatsappUrl);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Usuário não encontrado.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao buscar dados do vendedor: $e')),
+      );
     }
   }
 
