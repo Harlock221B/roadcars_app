@@ -138,7 +138,7 @@ class VehicleCard extends StatelessWidget {
                           color: Colors.grey[600]), // Ícone de combustível
                       const SizedBox(width: 4),
                       Text(
-                        vehicle['fuelType'] ?? "Gasolina",
+                        '${vehicle['fuel']}',
                         style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                       const SizedBox(width: 16),

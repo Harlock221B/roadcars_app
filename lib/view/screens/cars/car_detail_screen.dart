@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:roadcarsapp/components/utils/generic.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 import 'package:roadcarsapp/view/screens/cars/edit_car_screen.dart';
@@ -105,7 +104,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
           var vehicle = snapshot.data!.data() as Map<String, dynamic>;
           List<String> imageUrls = List<String>.from(vehicle['imageUrls']);
-          final String vehicleName = vehicle['model'] ?? 'Veículo Indefinido';
+          final String vehicleName = "${vehicle['brand']} ${vehicle['model']}";
           final double price =
               vehicle['price'] != null ? vehicle['price'].toDouble() : 0.0;
           final int km = vehicle['km'] != null ? vehicle['km'] as int : 0;

@@ -79,6 +79,8 @@ class _CatalogPageState extends State<CatalogPage> {
                           'year': vehicle['year'],
                           'price': vehicle['price'],
                           'km': vehicle['km'],
+                          'fuel': vehicle['fuel'],
+                          'transmission': vehicle['transmission'],
                           'description': vehicle['description'],
                           'imageUrls': vehicle['imageUrls'] as List<dynamic>,
                         },
