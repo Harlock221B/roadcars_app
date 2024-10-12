@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 import 'package:roadcarsapp/view/screens/cars/edit_car_screen.dart';
 import 'package:roadcarsapp/components/favoriteicon/favorite.dart';
+import 'package:roadcarsapp/components/image_carousel/image_carousel.dart';
 
 class VehicleDetailsPage extends StatefulWidget {
   final String carId; // O ID do carro no Firestore
@@ -123,7 +123,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildImageCarousel(imageUrls),
+                        ImageCarousel(imageUrls: imageUrls),
                         const SizedBox(height: 20),
                         Text(
                           vehicleName,
@@ -175,58 +175,6 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
             ],
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildImageCarousel(List<String> imageUrls) {
-    if (imageUrls.isEmpty) {
-      return Container(
-        height: 400,
-        color: Colors.grey[200],
-        child: const Center(
-          child: Text(
-            'Nenhuma imagem disponível',
-            style: TextStyle(fontSize: 18, color: Colors.grey),
-          ),
-        ),
-      );
-    }
-
-    return CarouselSlider.builder(
-      itemCount: imageUrls.length,
-      itemBuilder: (context, index, realIndex) {
-        String imageUrl = imageUrls[index];
-
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Image.network(
-            imageUrl,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-                ),
-              );
-            },
-            errorBuilder: (context, error, stackTrace) => const Icon(
-              Icons.error,
-              color: Colors.red,
-            ),
-          ),
-        );
-      },
-      options: CarouselOptions(
-        height: 350,
-        enlargeCenterPage: true,
-        viewportFraction: 0.8,
-        autoPlay: true,
       ),
     );
   }

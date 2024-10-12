@@ -411,6 +411,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 'model': vehicle['model'],
                                 'year': vehicle['year'],
                                 'price': vehicle['price'],
+                                'km': vehicle['km'],
+                                'fuel': vehicle['fuel'],
+                                'transmission': vehicle['transmission'],
                                 'description': vehicle['description'],
                                 'imageUrls':
                                     vehicle['imageUrls'] as List<dynamic>,
@@ -463,6 +466,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       'year': addedCar['year'],
                                       'price': addedCar['price'],
                                       'description': addedCar['description'],
+                                      'km': addedCar['km'],
+                                      'fuel': addedCar['fuel'],
+                                      'transmission': addedCar['transmission'],
                                       'imageUrls': addedCar['imageUrls']
                                           as List<dynamic>,
                                     },

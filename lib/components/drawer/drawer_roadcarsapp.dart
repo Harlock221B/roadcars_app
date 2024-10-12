@@ -151,14 +151,6 @@ class _MainDrawerRoadCarsState extends State<MainDrawerRoadCars> {
                         );
                       },
                     ),
-                    ListTile(
-                      leading: SvgPicture.asset(
-                        'assets/icons/favorite.svg',
-                        height: 22,
-                      ),
-                      title: const Text('Favoritos'),
-                      onTap: () {},
-                    ),
                   ],
                 ),
               ),
