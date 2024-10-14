@@ -3,12 +3,27 @@ import 'package:roadcarsapp/view/screens/cars/car_detail_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:roadcarsapp/components/favoriteicon/favorite.dart';
 import 'package:intl/intl.dart'; // Importação do pacote intl
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class VehicleCard extends StatelessWidget {
   final Map<String, dynamic> vehicle;
   final String carId;
 
   const VehicleCard({super.key, required this.vehicle, required this.carId});
+
+  Future<void> _deleteCar(BuildContext context) async {
+    try {
+      await FirebaseFirestore.instance.collection('cars').doc(carId).delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Carro excluído com sucesso!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao excluir carro: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +35,10 @@ class VehicleCard extends StatelessWidget {
 
     // Garantir que o valor de km seja um número
     final int km = vehicle['km'] != null ? vehicle['km'] as int : 0;
+
+    final User? currentUser = FirebaseAuth.instance.currentUser;
+    final bool isSeller =
+        currentUser != null && currentUser.uid == vehicle['userId'];
 
     return GestureDetector(
       onTap: () {
@@ -87,7 +106,40 @@ class VehicleCard extends StatelessWidget {
                 Positioned(
                   top: 12, // Ajuste na posição do ícone
                   right: 12,
-                  child: FavoriteIcon(carId: carId),
+                  child: Row(
+                    children: [
+                      FavoriteIcon(carId: carId),
+                      if (isSeller)
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () async {
+                            final bool? confirmDelete = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Confirmar Exclusão'),
+                                content: const Text(
+                                    'Você tem certeza que deseja excluir este carro?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
+                                    child: const Text('Excluir'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirmDelete == true) {
+                              _deleteCar(context);
+                            }
+                          },
+                        ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -111,8 +163,7 @@ class VehicleCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        currencyFormat.format(vehicle['price'] ??
-                            0), // Preço formatado com valor padrão
+                        currencyFormat.format(vehicle['price'] ?? 0),
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -129,22 +180,18 @@ class VehicleCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  // Adicione ícones para características do veículo
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Icon(Icons.local_gas_station,
-                          size: 16,
-                          color: Colors.grey[600]), // Ícone de combustível
+                          size: 16, color: Colors.grey[600]),
                       const SizedBox(width: 4),
                       Text(
                         '${vehicle['fuel']}',
                         style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                       const SizedBox(width: 16),
-                      Icon(Icons.drive_eta,
-                          size: 16,
-                          color: Colors.grey[600]), // Ícone de transmissão
+                      Icon(Icons.drive_eta, size: 16, color: Colors.grey[600]),
                       const SizedBox(width: 4),
                       Text(
                         vehicle['transmission'] ?? "Manual",
@@ -156,12 +203,10 @@ class VehicleCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Icon(Icons.speed,
-                          size: 16,
-                          color: Colors.grey[600]), // Ícone de quilometragem
+                      Icon(Icons.speed, size: 16, color: Colors.grey[600]),
                       const SizedBox(width: 4),
                       Text(
-                        "${kmFormat.format(km)} km", // Quilometragem formatada
+                        "${kmFormat.format(km)} km",
                         style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                     ],

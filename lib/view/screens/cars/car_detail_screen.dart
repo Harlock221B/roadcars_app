@@ -21,19 +21,19 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         title: const Text(
           'Detalhes do Veículo',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: Colors.white,
           ),
         ),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           FavoriteIcon(carId: widget.carId), // Ícone de Favoritar no AppBar
-          // Botão de edição condicional
+          // Botão de edição e exclusão condicional
           FutureBuilder<User?>(
             future: FirebaseAuth.instance.userChanges().first,
             builder: (context, snapshot) {
@@ -65,22 +65,30 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   final vehicleOwnerId = vehicle['userId'];
 
                   return vehicleOwnerId == currentUserId
-                      ? IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.black87),
-                          onPressed: () async {
-                            final result = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EditCarScreen(
-                                  carId: widget.carId,
-                                ),
-                              ),
-                            );
+                      ? Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.white),
+                              onPressed: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditCarScreen(
+                                      carId: widget.carId,
+                                    ),
+                                  ),
+                                );
 
-                            if (result == true) {
-                              setState(() {}); // Força o rebuild da página
-                            }
-                          },
+                                if (result == true) {
+                                  setState(() {}); // Força o rebuild da página
+                                }
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _confirmDelete(context),
+                            ),
+                          ],
                         )
                       : const SizedBox.shrink();
                 },
@@ -351,5 +359,48 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         ),
       ],
     );
+  }
+
+  void _confirmDelete(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmar Exclusão'),
+          content:
+              const Text('Você tem certeza que deseja excluir este veículo?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteVehicle();
+              },
+              child: const Text('Excluir', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteVehicle() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('cars')
+          .doc(widget.carId)
+          .delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Veículo excluído com sucesso')),
+      );
+      Navigator.of(context).pop(); // Volta para a tela anterior
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao excluir veículo: $e')),
+      );
+    }
   }
 }
