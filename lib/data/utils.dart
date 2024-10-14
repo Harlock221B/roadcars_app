@@ -30,6 +30,13 @@ List<String> fuelTypes = ['Gasolina', 'Diesel', 'Elétrico', 'Híbrido'];
 // Tipos de combustível
 List<String> transmissions = ['Automático', 'Manual', 'CVT']; // Câmbios
 
+List<String> _statusOptions = [
+  'Vendido',
+  'Disponível',
+  'Pendente',
+  'Em Negociação'
+];
+
 Map<String, Color> carColors = {
   'black': Colors.black,
   'white': Colors.white,

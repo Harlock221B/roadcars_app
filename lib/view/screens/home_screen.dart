@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:roadcarsapp/components/vehicle/vehicle_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:roadcarsapp/view/screens/users/login_screen.dart';
+import 'package:roadcarsapp/view/screens/users/profile_screen.dart';
+import 'package:roadcarsapp/data/utils.dart';
 import 'package:roadcarsapp/components/drawer/drawer_roadcarsapp.dart'; // Importação do drawer
 
 class HomeScreen extends StatelessWidget {
@@ -18,7 +20,7 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
         foregroundColor: Colors.white,
       ),
-      drawer: const MainDrawerRoadCars(),
+      drawer: const MainDrawerRoadCars(), // Adicionando o drawer
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -94,18 +96,10 @@ class _LoggedInViewState extends State<LoggedInView> {
                           .where('status', isEqualTo: selectedStatus)
                           .snapshots(),
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
+                    if (!snapshot.hasData) {
                       return const Center(child: CircularProgressIndicator());
                     }
-                    if (snapshot.hasError) {
-                      return const Center(
-                        child: Text(
-                          'Você não adicionou nenhum carro.',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
-                        ),
-                      );
-                    }
-                    final cars = snapshot.data?.docs ?? [];
+                    final cars = snapshot.data!.docs;
                     return ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -143,11 +137,10 @@ class _LoggedInViewState extends State<LoggedInView> {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
-                StreamBuilder(
+                StreamBuilder<DocumentSnapshot>(
                   stream: FirebaseFirestore.instance
-                      .collection('favorites')
-                      .where('userId',
-                          isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                      .collection('users')
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -156,39 +149,98 @@ class _LoggedInViewState extends State<LoggedInView> {
                     if (snapshot.hasError) {
                       return const Center(
                         child: Text(
+                          'Erro ao carregar favoritos.',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      );
+                    }
+                    if (!snapshot.hasData || !snapshot.data!.exists) {
+                      return const Center(
+                        child: Text(
                           'Você não tem nenhum carro favoritado.',
                           style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                       );
                     }
-                    final favorites = snapshot.data?.docs ?? [];
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: favorites.length,
-                      itemBuilder: (context, index) {
-                        final favorite = favorites[index].data();
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10.0),
-                          child: Material(
-                            elevation: 8,
-                            borderRadius: BorderRadius.circular(12),
-                            child: VehicleCard(
-                              carId: favorite['carId'],
-                              vehicle: {
-                                'brand': favorite['brand'],
-                                'model': favorite['model'],
-                                'year': favorite['year'],
-                                'price': favorite['price'],
-                                'description': favorite['description'],
-                                'km': favorite['km'],
-                                'fuel': favorite['fuel'],
-                                'transmission': favorite['transmission'],
-                                'imageUrls':
-                                    favorite['imageUrls'] as List<dynamic>,
-                              },
+
+                    final userData =
+                        snapshot.data!.data() as Map<String, dynamic>;
+                    final List<dynamic> favoritedCars =
+                        userData['favoritedCars'] ?? [];
+
+                    if (favoritedCars.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'Você não tem nenhum carro favoritado.',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      );
+                    }
+
+                    return FutureBuilder<List<DocumentSnapshot>>(
+                      future: FirebaseFirestore.instance
+                          .collection('cars')
+                          .where(FieldPath.documentId, whereIn: favoritedCars)
+                          .get()
+                          .then((snapshot) => snapshot.docs),
+                      builder: (context, carSnapshot) {
+                        if (carSnapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
+                        if (carSnapshot.hasError) {
+                          return const Center(
+                            child: Text(
+                              'Erro ao carregar carros favoritados.',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
                             ),
-                          ),
+                          );
+                        }
+                        if (!carSnapshot.hasData || carSnapshot.data!.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              'Você não tem nenhum carro favoritado.',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
+                            ),
+                          );
+                        }
+
+                        final favoritedCarsData = carSnapshot.data!;
+
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: favoritedCarsData.length,
+                          itemBuilder: (context, index) {
+                            final car = favoritedCarsData[index].data()
+                                as Map<String, dynamic>;
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 10.0),
+                              child: Material(
+                                elevation: 8,
+                                borderRadius: BorderRadius.circular(12),
+                                child: VehicleCard(
+                                  carId: favoritedCarsData[index].id,
+                                  vehicle: {
+                                    'brand': car['brand'],
+                                    'model': car['model'],
+                                    'year': car['year'],
+                                    'price': car['price'],
+                                    'description': car['description'],
+                                    'km': car['km'],
+                                    'fuel': car['fuel'],
+                                    'transmission': car['transmission'],
+                                    'imageUrls':
+                                        car['imageUrls'] as List<dynamic>,
+                                  },
+                                ),
+                              ),
+                            );
+                          },
                         );
                       },
                     );

@@ -43,6 +43,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
   String _selectedTransmission = 'Automático'; // Valor inicial para câmbio
   String _selectedColor = 'Preto'; // Valor inicial para cor
   bool _isArmored = false; // Valor inicial para blindagem
+  String _selectedStatus = 'Disponível'; // Valor inicial para status
 
   bool _isLoading = false; // Indicador de carregamento
 
@@ -136,6 +137,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
           'description': _descriptionController.text,
           'createdAt': FieldValue.serverTimestamp(),
           'userId': _auth.currentUser!.uid,
+          'status': _selectedStatus,
         });
 
         // Upload das imagens para o Storage
