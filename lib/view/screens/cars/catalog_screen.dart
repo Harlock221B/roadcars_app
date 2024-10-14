@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:roadcarsapp/components/appbar/appbar_roadcarsapp.dart';
+import 'package:roadcarsapp/components/drawer/drawer_roadcarsapp.dart';
 import 'package:roadcarsapp/components/vehicle/vehicle_card.dart';
 import 'add_car_screen.dart';
 
@@ -196,7 +196,8 @@ class _CatalogPageState extends State<CatalogPage> {
           ),
         ],
       ),
-      endDrawer: _buildFilterDrawer(), // Menu lateral direito
+      drawer: const MainDrawerRoadCars(),
+      endDrawer: _buildFilterDrawer(),
       body: Column(
         children: [
           Expanded(

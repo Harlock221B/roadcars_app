@@ -3,8 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:roadcarsapp/components/vehicle/vehicle_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:roadcarsapp/view/screens/users/login_screen.dart';
-import 'package:roadcarsapp/view/screens/users/profile_screen.dart';
-import 'package:roadcarsapp/data/utils.dart';
 import 'package:roadcarsapp/components/drawer/drawer_roadcarsapp.dart'; // Importação do drawer
 
 class HomeScreen extends StatelessWidget {
@@ -16,11 +14,11 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('RoadCars'),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         elevation: 0,
-        foregroundColor: Colors.black,
+        foregroundColor: Colors.white,
       ),
-      drawer: const MainDrawerRoadCars(), // Adicionando o drawer
+      drawer: const MainDrawerRoadCars(),
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {

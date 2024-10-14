@@ -23,7 +23,22 @@ dependencies:
   dotted_border: ^2.1.0
   flutter_svg: ^2.0.10+1
   flutter_launcher_icons: ^0.10.0
+  flutter_native_splash: ^2.2.16
   flutter_form_builder: ^7.0.0
+
+flutter_native_splash:
+  color: "#000000"
+  image: "assets/app/splash.png"
+  android: true
+  ios: true
+
+flutter_icons:
+  image_path: "assets/app/icon.png"
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/app/icon-android.png"
 
 dev_dependencies:
   flutter_test:
@@ -37,8 +52,4 @@ flutter:
     - assets/
     - assets/images/
     - assets/icons/
-
-flutter_icons:
-  android: true
-  ios: true
-  image_path: "assets/images/roadcars.png"
+    - assets/app/
