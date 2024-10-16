@@ -40,6 +40,8 @@ class VehicleCard extends StatelessWidget {
     final bool isSeller =
         currentUser != null && currentUser.uid == vehicle['userId'];
 
+    final bool isArmored = vehicle['armored'] ?? false;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -108,7 +110,7 @@ class VehicleCard extends StatelessWidget {
                   right: 12,
                   child: Row(
                     children: [
-                      FavoriteIcon(carId: carId),
+                      if (currentUser != null) FavoriteIcon(carId: carId),
                       if (isSeller)
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
@@ -191,12 +193,22 @@ class VehicleCard extends StatelessWidget {
                         style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                       const SizedBox(width: 16),
-                      Icon(Icons.drive_eta, size: 16, color: Colors.grey[600]),
+                      Icon(Icons.drive_eta, size: 14, color: Colors.grey[600]),
                       const SizedBox(width: 4),
                       Text(
                         vehicle['transmission'] ?? "Manual",
                         style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
+                      const SizedBox(width: 16),
+                      if (isArmored) ...[
+                        Icon(Icons.security, size: 14, color: Colors.grey[600]),
+                        const SizedBox(width: 4),
+                        Text(
+                          "Blindado",
+                          style:
+                              TextStyle(fontSize: 14, color: Colors.grey[600]),
+                        ),
+                      ]
                     ],
                   ),
                   const SizedBox(height: 8),

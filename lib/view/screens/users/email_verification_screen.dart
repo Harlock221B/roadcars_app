@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:roadcarsapp/components/appbar/appbar_roadcarsapp.dart';
 
 class EmailVerificationScreen extends StatelessWidget {
   const EmailVerificationScreen({super.key});
@@ -6,20 +7,13 @@ class EmailVerificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Verificação de E-mail'),
-        backgroundColor: Colors.blueGrey,
-      ),
+      appBar: MainAppBarRoadCars(),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image.asset(
-                'assets/email_verification.png', // Certifique-se de que a imagem está na pasta assets
-                height: 150,
-              ),
               const SizedBox(height: 30),
               const Text(
                 'Verifique seu E-mail',

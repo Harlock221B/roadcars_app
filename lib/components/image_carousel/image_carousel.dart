@@ -4,7 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 class ImageCarousel extends StatelessWidget {
   final List<String> imageUrls;
 
-  const ImageCarousel({required this.imageUrls, Key? key}) : super(key: key);
+  const ImageCarousel({required this.imageUrls, super.key});
 
   @override
   Widget build(BuildContext context) {

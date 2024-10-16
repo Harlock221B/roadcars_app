@@ -11,13 +11,13 @@ class ImagePickerComponent extends StatelessWidget {
       onRemoveImageUrl; // Para remover URLs de imagens salvas
 
   const ImagePickerComponent({
-    Key? key,
+    super.key,
     required this.carImages,
     required this.carImageUrls,
     required this.onPickImages,
     required this.onRemoveImage,
     required this.onRemoveImageUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

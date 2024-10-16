@@ -8,7 +8,6 @@ import 'package:roadcarsapp/components/utils/dropdown_field.dart';
 import 'package:roadcarsapp/components/utils/text_field.dart';
 import 'package:roadcarsapp/components/image_picker/image_picker.dart';
 import 'package:roadcarsapp/components/utils/generic.dart'; // Importação dos componentes genéricos
-import 'dart:typed_data';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart'; // Importação necessária para FilteringTextInputFormatter
 import 'package:intl/intl.dart'; // Importação do pacote intl

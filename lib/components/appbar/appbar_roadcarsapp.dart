@@ -8,11 +8,10 @@ class MainAppBarRoadCars extends StatelessWidget
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.black,
-      title: Image.network(
-        'https://roadcars.com.br/static/photos/logo/brand.png',
-        width: 100,
-      ),
+      title: Image.asset('assets/images/roadcars.png', width: 100),
       iconTheme: const IconThemeData(color: Colors.white),
+      centerTitle: true,
+      elevation: 0,
     );
   }
 

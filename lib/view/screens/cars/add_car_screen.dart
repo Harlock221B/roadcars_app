@@ -43,7 +43,7 @@ class _AddCarScreenState extends State<AddCarScreen> {
   String _selectedTransmission = 'Automático'; // Valor inicial para câmbio
   String _selectedColor = 'Preto'; // Valor inicial para cor
   bool _isArmored = false; // Valor inicial para blindagem
-  String _selectedStatus = 'Disponível'; // Valor inicial para status
+  final String _selectedStatus = 'Disponível'; // Valor inicial para status
 
   bool _isLoading = false; // Indicador de carregamento
 
@@ -106,6 +106,14 @@ class _AddCarScreenState extends State<AddCarScreen> {
         const SnackBar(
             content:
                 Text('Você precisa estar logado para adicionar um carro.')),
+      );
+      return;
+    }
+
+    if (_carImages.length < 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Você precisa adicionar pelo menos 3 imagens.')),
       );
       return;
     }

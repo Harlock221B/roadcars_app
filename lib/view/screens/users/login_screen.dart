@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../main.dart'; // Importe a tela de início
-import 'register_screen.dart'; // Importe a tela de registro
-import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'register_screen.dart';
+import 'package:roadcarsapp/view/screens/home_screen.dart';
+import 'package:roadcarsapp/view/screens/users/forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
@@ -30,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
           );
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const MainPage()),
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -43,6 +46,41 @@ class _LoginScreenState extends State<LoginScreen> {
           SnackBar(content: Text('Falha no login: ${e.message}')),
         );
       }
+    }
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        return; // O usuário cancelou o login
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+
+      if (userCredential.additionalUserInfo?.isNewUser ?? false) {
+        // Se o usuário é novo, você pode adicionar lógica adicional aqui, como salvar dados no Firestore
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Conta criada com sucesso!')),
+        );
+      }
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao fazer login com o Google: $e')),
+      );
     }
   }
 
@@ -124,7 +162,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        // Lógica de recuperação de senha
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const ForgotPasswordScreen()),
+                        );
                       },
                       child: const Text(
                         'Esqueceu a senha?',

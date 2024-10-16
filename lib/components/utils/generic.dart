@@ -7,10 +7,10 @@ class KmInputField extends StatelessWidget {
   final String label;
 
   const KmInputField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.label,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -71,10 +71,10 @@ class PriceInputField extends StatelessWidget {
   final String label;
 
   const PriceInputField({
-    Key? key,
+    super.key,
     required this.controller,
     required this.label,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

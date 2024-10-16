@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:roadcarsapp/components/appbar/appbar_roadcarsapp.dart';
 import 'package:roadcarsapp/components/vehicle/vehicle_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:roadcarsapp/view/screens/users/login_screen.dart';
-import 'package:roadcarsapp/view/screens/users/profile_screen.dart';
-import 'package:roadcarsapp/data/utils.dart';
-import 'package:roadcarsapp/components/drawer/drawer_roadcarsapp.dart'; // Importação do drawer
+import 'package:roadcarsapp/components/drawer/drawer_roadcarsapp.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -13,14 +12,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('RoadCars'),
-        centerTitle: true,
-        backgroundColor: Colors.black,
-        elevation: 0,
-        foregroundColor: Colors.white,
-      ),
-      drawer: const MainDrawerRoadCars(), // Adicionando o drawer
+      appBar: MainAppBarRoadCars(),
+      drawer: const MainDrawerRoadCars(),
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -116,6 +109,7 @@ class _LoggedInViewState extends State<LoggedInView> {
                               vehicle: {
                                 'brand': car['brand'],
                                 'model': car['model'],
+                                'armored': car['armored'],
                                 'year': car['year'],
                                 'price': car['price'],
                                 'description': car['description'],

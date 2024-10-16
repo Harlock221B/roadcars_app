@@ -92,72 +92,77 @@ class _CatalogPageState extends State<CatalogPage> {
   Widget _buildFilterDrawer() {
     return Drawer(
       elevation: 16.0,
-      child: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          const Text(
-            'Filtros',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const Divider(),
-          const SizedBox(height: 10),
-          _buildDropdownFilter('Marca', brands, selectedBrand, (value) {
-            setState(() {
-              selectedBrand = value;
-            });
-          }),
-          const SizedBox(height: 10),
-          _buildDropdownFilter('Modelo', models, selectedModel, (value) {
-            setState(() {
-              selectedModel = value;
-            });
-          }),
-          const SizedBox(height: 10),
-          _buildDropdownFilter('Motor', motors, selectedMotor, (value) {
-            setState(() {
-              selectedMotor = value;
-            });
-          }),
-          const SizedBox(height: 10),
-          _buildDropdownFilter('Combustível', fuels, selectedFuel, (value) {
-            setState(() {
-              selectedFuel = value;
-            });
-          }),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // Fecha o drawer
-            },
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+      child: Padding(
+        padding:
+            const EdgeInsets.only(top: 36.0), // Adicionando espaçamento no topo
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            const Text(
+              'Filtros',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            child:
-                const Text('Aplicar Filtros', style: TextStyle(fontSize: 16)),
-          ),
-          const SizedBox(height: 10),
-          TextButton(
-            onPressed: () {
+            const Divider(),
+            const SizedBox(height: 10),
+            _buildDropdownFilter('Marca', brands, selectedBrand, (value) {
               setState(() {
-                selectedBrand = null;
-                selectedModel = null;
-                selectedMotor = null;
-                selectedFuel = null;
+                selectedBrand = value;
               });
-              Navigator.pop(context); // Fecha o drawer após limpar
-            },
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            }),
+            const SizedBox(height: 10),
+            _buildDropdownFilter('Modelo', models, selectedModel, (value) {
+              setState(() {
+                selectedModel = value;
+              });
+            }),
+            const SizedBox(height: 10),
+            _buildDropdownFilter('Motor', motors, selectedMotor, (value) {
+              setState(() {
+                selectedMotor = value;
+              });
+            }),
+            const SizedBox(height: 10),
+            _buildDropdownFilter('Combustível', fuels, selectedFuel, (value) {
+              setState(() {
+                selectedFuel = value;
+              });
+            }),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context); // Fecha o drawer
+              },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
+              child:
+                  const Text('Aplicar Filtros', style: TextStyle(fontSize: 16)),
             ),
-            child: const Text('Limpar Filtros', style: TextStyle(fontSize: 16)),
-          ),
-        ],
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  selectedBrand = null;
+                  selectedModel = null;
+                  selectedMotor = null;
+                  selectedFuel = null;
+                });
+                Navigator.pop(context); // Fecha o drawer após limpar
+              },
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child:
+                  const Text('Limpar Filtros', style: TextStyle(fontSize: 16)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -185,7 +190,8 @@ class _CatalogPageState extends State<CatalogPage> {
     return Scaffold(
       key: _scaffoldKey, // Atribuindo a chave ao Scaffold
       appBar: AppBar(
-        title: const Text('Catálogo de Veículos'),
+        title: const Text('Catálogo de Veículos',
+            style: TextStyle(color: Colors.white)),
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
@@ -195,6 +201,9 @@ class _CatalogPageState extends State<CatalogPage> {
             },
           ),
         ],
+        centerTitle: true,
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       drawer: const MainDrawerRoadCars(),
       endDrawer: _buildFilterDrawer(),
@@ -227,6 +236,7 @@ class _CatalogPageState extends State<CatalogPage> {
                           vehicle: {
                             'brand': vehicle['brand'],
                             'model': vehicle['model'],
+                            'armored': vehicle['armored'],
                             'year': vehicle['year'],
                             'price': vehicle['price'],
                             'km': vehicle['km'],

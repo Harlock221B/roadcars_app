@@ -9,7 +9,7 @@ import 'package:roadcarsapp/components/image_carousel/image_carousel.dart';
 
 class VehicleDetailsPage extends StatefulWidget {
   final String carId; // O ID do carro no Firestore
-  const VehicleDetailsPage({required this.carId, Key? key}) : super(key: key);
+  const VehicleDetailsPage({required this.carId, super.key});
 
   @override
   _VehicleDetailsPageState createState() => _VehicleDetailsPageState();

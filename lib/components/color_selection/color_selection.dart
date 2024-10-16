@@ -9,8 +9,8 @@ class ColorSelection extends StatelessWidget {
     required this.selectedColor,
     required this.colors,
     required this.onColorSelected,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

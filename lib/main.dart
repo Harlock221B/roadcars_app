@@ -85,7 +85,7 @@ class _MainPageState extends State<MainPage> {
         bool isLoggedIn = snapshot.data != null;
 
         final List<Widget> pages = [
-          HomeScreen(),
+          const HomeScreen(),
           const CatalogPage(),
           isLoggedIn ? const ProfileScreen() : const LoginScreen(),
         ];

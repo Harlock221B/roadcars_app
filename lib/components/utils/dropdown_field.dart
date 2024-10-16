@@ -11,8 +11,8 @@ class DropdownField extends StatelessWidget {
     required this.selectedValue,
     required this.options,
     required this.onChanged,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
