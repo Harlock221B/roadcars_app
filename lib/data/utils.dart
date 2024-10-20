@@ -38,9 +38,9 @@ List<String> _statusOptions = [
 ];
 
 Map<String, Color> carColors = {
-  'black': Colors.black,
-  'white': Colors.white,
-  'silver': Colors.grey,
-  'blue': Colors.blue,
-  'red': Colors.red,
+  'Preto': Colors.black,
+  'Branco': Colors.white,
+  'Prata': Colors.grey,
+  'Azul': Colors.blue,
+  'Vermelho': Colors.red,
 };
