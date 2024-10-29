@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:roadcarsapp/data/utils.dart';
 import 'package:roadcarsapp/components/drawer/drawer_roadcarsapp.dart';
 import 'package:roadcarsapp/components/vehicle/vehicle_card.dart';
-import 'add_car_screen.dart';
+import 'package:roadcarsapp/view/screens/cars/add_car_screen.dart';
+import 'package:roadcarsapp/components/color_selection/color_selection.dart';
 
 class CatalogPage extends StatefulWidget {
   const CatalogPage({super.key});
@@ -14,13 +16,14 @@ class CatalogPage extends StatefulWidget {
 
 class _CatalogPageState extends State<CatalogPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final GlobalKey<ScaffoldState> _scaffoldKey =
-      GlobalKey<ScaffoldState>(); // GlobalKey para controlar o Scaffold
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool vendor = false;
   String? selectedBrand;
   String? selectedModel;
   String? selectedMotor;
   String? selectedFuel;
+  String? selectedColor;
+  List<String> colors = [];
   List<String> brands = [];
   List<String> models = [];
   List<String> motors = [];
@@ -66,6 +69,11 @@ class _CatalogPageState extends State<CatalogPage> {
           .map((doc) => doc['fuel'] as String)
           .toSet()
           .toList();
+      // Coletando as cores
+      colors = carsSnapshot.docs
+          .map((doc) => doc['color'] as String)
+          .toSet()
+          .toList();
     });
   }
 
@@ -83,6 +91,9 @@ class _CatalogPageState extends State<CatalogPage> {
     }
     if (selectedFuel != null && selectedFuel!.isNotEmpty) {
       query = query.where('fuel', isEqualTo: selectedFuel);
+    }
+    if (selectedColor != null && selectedColor!.isNotEmpty) {
+      query = query.where('color', isEqualTo: selectedColor);
     }
 
     return query.snapshots();
@@ -128,6 +139,15 @@ class _CatalogPageState extends State<CatalogPage> {
               });
             }),
             const SizedBox(height: 20),
+            ColorSelection(
+              selectedColor: selectedColor ?? '',
+              colors: carColors,
+              onColorSelected: (color) {
+                setState(() {
+                  selectedColor = color;
+                });
+              },
+            ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context); // Fecha o drawer
