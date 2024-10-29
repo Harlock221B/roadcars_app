@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:intl/intl.dart';
 import 'package:roadcarsapp/view/screens/cars/edit_car_screen.dart';
 import 'package:roadcarsapp/components/favoriteicon/favorite.dart';
@@ -209,13 +210,15 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Text(
-                  vehicle['description'] ?? 'Sem descrição disponível.',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black54,
-                    height: 1.5,
-                  ),
+                Html(
+                  data: vehicle['description'] ?? 'Sem descrição disponível.',
+                  style: {
+                    "body": Style(
+                      fontSize: FontSize(16.0),
+                      color: Colors.black54,
+                      lineHeight: LineHeight(1.5),
+                    ),
+                  },
                 ),
               ],
             ),
@@ -327,8 +330,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
       // Verificando se o snapshot contém dados
       if (userSnapshot.exists) {
-        final String phoneNumber =
-            userSnapshot['phone'] ?? 'Número não disponível';
+        final String phoneNumber = '5511986300771' ?? 'Número não disponível';
 
         // Montando a URL do WhatsApp
         final String whatsappUrl =
